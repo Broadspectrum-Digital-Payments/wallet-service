@@ -4,7 +4,7 @@ namespace App\Http\Requests\Actions\Registration;
 
 use App\Interfaces\USSDMenu;
 use App\Interfaces\USSDRequest;
-use App\Services\PaytabsWalletService;
+use App\Services\WalletService;
 use Illuminate\Support\Facades\Validator;
 
 class VerifyOTP implements USSDMenu
@@ -17,7 +17,7 @@ class VerifyOTP implements USSDMenu
 
         if ($validation->fails()) return endedSessionMessage($validation->messages()->first());
 
-        if ($response = PaytabsWalletService::verifyOTP($request->getMSISDN(), $otp)) {
+        if ($response = WalletService::verifyOTP($request->getMSISDN(), $otp)) {
             if (($response['status'] ?? null) && $resourceId = $response['payloadX']['resourceId'] ?? null) {
                 updateSessionData($request->getSessionId(), $resourceId);
                 return EnterFullNameOption::menu($request, $sessionData);

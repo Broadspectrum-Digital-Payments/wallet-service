@@ -4,6 +4,7 @@ namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
@@ -22,7 +23,10 @@ class User extends Authenticatable
         'name',
         'email',
         'phone_number',
+        'ghana_card_number',
         'pin',
+        'status',
+        'kyc_status',
     ];
 
     /**
@@ -43,5 +47,23 @@ class User extends Authenticatable
     protected $casts = [
         'email_verified_at' => 'datetime',
         'password' => 'hashed',
+        'pin' => 'hashed'
     ];
+
+    public function login(): void
+    {
+        $this->tokens()->delete();
+        $token = $this->createToken('login');
+        $this->bearerToken = $token->plainTextToken;
+    }
+
+    public function setPinAttribute(string $pin): void
+    {
+        $this->attributes['pin'] = bcrypt(trim($pin));
+    }
+
+    public function files(): MorphMany
+    {
+        return $this->morphMany(File::class, 'model');
+    }
 }

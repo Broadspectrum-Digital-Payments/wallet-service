@@ -4,7 +4,7 @@ namespace App\Http\Requests\Actions\Registration;
 
 use App\Interfaces\USSDMenu;
 use App\Interfaces\USSDRequest;
-use App\Services\PaytabsWalletService;
+use App\Services\WalletService;
 
 class GenerateOTP implements USSDMenu
 {
@@ -13,7 +13,7 @@ class GenerateOTP implements USSDMenu
     {
         $message = "Operation failed, please try again later.";
 
-        if (PaytabsWalletService::generateOTP($request->getMSISDN())) {
+        if (WalletService::generateOTP($request->getMSISDN())) {
             updateSessionData($request->getSessionId(), 'otp');
             $message = "OTP has been sent to your phone number, please check and dial " . config('ussd.code') . " to continue your registration.";
         }

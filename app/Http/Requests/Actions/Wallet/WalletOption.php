@@ -5,7 +5,7 @@ namespace App\Http\Requests\Actions\Wallet;
 use App\Http\Requests\ArkeselUSSDRequest;
 use App\Interfaces\USSDMenu;
 use App\Interfaces\USSDRequest;
-use App\Services\PaytabsWalletService;
+use App\Services\WalletService;
 
 /**
  * Class WalletOption
@@ -100,7 +100,7 @@ class WalletOption implements USSDMenu
 
         if (self::isFifthLevelOption($sessionData)) {
             // Send change PIN request, this triggers an OTP
-            if (($response = PaytabsWalletService::changePIN($sessionData[3], $sessionData[4])) && $response['status'] ?? null) {
+            if (($response = WalletService::changePIN($sessionData[3], $sessionData[4])) && $response['status'] ?? null) {
                 sleep(2);
                 return continueSessionMessage(ussdMenu([
                     "Change PIN",
@@ -113,7 +113,7 @@ class WalletOption implements USSDMenu
 
         if (self::isSixthLevelOption($sessionData)) {
             // Send PIN change confirmation
-            $message = (($response = PaytabsWalletService::confirmChangePIN($sessionData[3], $sessionData[4], $sessionData[5])) && $response['status'] ?? null) ?
+            $message = (($response = WalletService::confirmChangePIN($sessionData[3], $sessionData[4], $sessionData[5])) && $response['status'] ?? null) ?
                 "You have successfully changed your PIN" :
                 "PIN change failed, please try again later";
 

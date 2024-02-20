@@ -14,11 +14,14 @@ return new class extends Migration {
             $table->id();
             $table->uuid('external_id')->unique();
             $table->string('name');
-            $table->string('email')->unique();
-            $table->string('phone_number')->unique();
-            $table->timestamp('email_verified_at')->nullable();
+            $table->string('ghana_card_number')->index();
+            $table->string('phone_number')->index();
             $table->string('pin');
-            $table->rememberToken();
+            $table->string('type')->default("user");
+            $table->string('status')->default("created");
+            $table->string('kyc_status')->default("queued");
+            $table->bigInteger('actual_balance')->default(0);
+            $table->bigInteger('available_balance')->default(0);
             $table->timestamps();
         });
     }

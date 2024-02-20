@@ -6,7 +6,7 @@ use GuzzleHttp\Promise\PromiseInterface;
 use Illuminate\Http\Client\Response;
 use Illuminate\Support\Facades\Http;
 
-class PaytabsWalletService
+class WalletService
 {
     private const BASE_URI = 'http://api.bsl.com.gh:8080/rest';
 

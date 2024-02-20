@@ -2,7 +2,9 @@
 
 
 use App\Rules\PINMatchRule;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Validator;
+use Symfony\Component\HttpFoundation\Response;
 
 function continueSessionMessage(string $message): array
 {
@@ -57,4 +59,30 @@ function validatePIN(string $phoneNumber, string $pin)
     ], [
         'pin.digits' => 'PIN must be 6 digits'
     ]);
+}
+
+function errorResponse(string $message = "Something went wrong, please try again later.", int $status = Response::HTTP_INTERNAL_SERVER_ERROR): JsonResponse
+{
+    return \jsonResponse(
+        [
+            'success' => false,
+            'message' => $message
+        ], $status
+    );
+}
+
+function successfulResponse(array $data, string $message = "Operation successful", int $status = Response::HTTP_OK): JsonResponse
+{
+    return \jsonResponse(
+        [
+            'success' => true,
+            ...$data,
+            'message' => $message
+        ], $status
+    );
+}
+
+function jsonResponse(array $data = [], int $status = Response::HTTP_OK): JsonResponse
+{
+    return response()->json($data, $status);
 }
