@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use GuzzleHttp\Promise\PromiseInterface;
 use Illuminate\Http\Client\Response;
 use Illuminate\Support\Facades\Http;
 
@@ -37,6 +38,14 @@ class PaytabsWalletService
 
         info("PaytabsWalletService Response", $response->json());
 
+        return $response;
+    }
+
+    private static function putRequest(string $endpoint, array $data, string $phoneNumber, string $PIN): PromiseInterface|Response
+    {
+        info("PaytabsWalletService Request", ['endpoint' => $endpoint, 'data', $data]);
+        $response = Http::withHeader("Paynet-Session-Token", self::getSessionId($phoneNumber, $PIN))->put($endpoint, $data);
+        info("PaytabsWalletService Response", $response->json());
         return $response;
     }
 
@@ -92,25 +101,77 @@ class PaytabsWalletService
         return [];
     }
 
-    public static function changePIN(string $oldPIN, string $newPIN)
+    public static function getSessionId(string $phoneNumber, string $PIN): string
+    {
+        if ($sessionId = cache($phoneNumber . '_sessionId')) {
+            return $sessionId;
+        }
+
+        $sessionId = self::login(phoneNumber: $phoneNumber, PIN: $PIN);
+        cache([$phoneNumber . '_sessionId' => $sessionId]);
+        return $sessionId;
+    }
+
+    /**
+     * Login with phone number and PIN.
+     *
+     * @param string $phoneNumber The phone number to log in with.
+     * @param string $PIN The PIN code for authentication.
+     *
+     * @return string The session ID if the login is successful and the session is not expired. Otherwise, an empty string is returned.
+     */
+    private static function login(string $phoneNumber, string $PIN): string
+    {
+        $response = self::executePostRequest(
+            endpoint: "/access/login",
+            data: [
+                "authType" => "SESSION"
+            ],
+            username: $phoneNumber,
+            password: $PIN
+        );
+
+        return ($response->successful() && $response->json('status') && !$response->json('sessionExpired')) ?
+            $response->json('sessionId') : "";
+    }
+
+    /**
+     * Change PIN for the current member.
+     *
+     * @param string $oldPIN The old PIN to be changed.
+     * @param string $newPIN The new PIN to replace the old PIN.
+     *
+     * @return array The response from the PIN change process. An empty array is returned if the PIN change is unsuccessful.
+     */
+    public static function changePIN(string $phoneNumber, string $oldPIN, string $newPIN): array
     {
         $request = self::executePostRequest("/member/self/pin", [
             "oldPin" => $oldPIN,
             "newPin" => $newPIN,
             "confirmPin" => $newPIN
-        ], "233249621938", "100589");
+        ], $phoneNumber, $oldPIN);
 
         return $request->successful() ? $request->json() : [];
     }
 
-    public static function confirmChangePIN(string $oldPIN, string $newPIN, string $otp)
+    /**
+     * Confirms the change of a PIN for the specified phone number.
+     *
+     * @param string $phoneNumber The phone number of the member.
+     * @param string $oldPIN The old PIN to be replaced.
+     * @param string $newPIN The new PIN to be set.
+     * @param string $otp The One-Time Password for verification.
+     *
+     * @return array The JSON response from the API, or an empty array if the request was not successful.
+     */
+    public static function confirmChangePIN(string $phoneNumber, string $oldPIN, string $newPIN, string $otp): array
     {
         $request = self::executePostRequest("/member/self/pin", [
             "oldPin" => $oldPIN,
             "newPin" => $newPIN,
             "confirmPin" => $newPIN,
             "otp" => $otp
-        ], "braasig@gmail.com", "100589");
+        ], $phoneNumber, $oldPIN);
 
         return $request->successful() ? $request->json() : [];
     }
