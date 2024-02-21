@@ -15,13 +15,17 @@ return new class extends Migration
         Schema::create('transactions', function (Blueprint $table) {
             $table->id();
             $table->uuid('external_id')->unique();
+            $table->uuid('stan')->index();
             $table->uuid('processor_reference')->unique()->nullable();
             $table->string('account_number')->index();
             $table->string('account_issuer')->index();
+            $table->string('account_name')->index()->nullable();
             $table->string('type')->index();
             $table->bigInteger('amount');
             $table->bigInteger('balance_before');
             $table->bigInteger('balance_after');
+            $table->bigInteger('fee');
+            $table->bigInteger('tax');
             $table->string('description');
             $table->foreignIdFor(User::class);
             $table->string('status')->default('queued')->index();

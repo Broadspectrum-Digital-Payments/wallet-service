@@ -28,7 +28,8 @@ class UserRegistrationRequest extends FormRequest
             'phone_number' => ['required', 'digits:10', 'unique:users,phone_number'],
             'pin' => ['required', 'digits:4'],
             'otp' => ['required', 'digits:6'],
-            'pinConfirmation' => ['required', 'digits:4', 'same:pin']
+            'pinConfirmation' => ['required', 'digits:4', 'same:pin'],
+            'type' => ['required', 'string']
         ];
     }
 
@@ -36,7 +37,8 @@ class UserRegistrationRequest extends FormRequest
     {
         $this->merge([
             'ghana_card_number' => $this->input('ghanaCardNumber'),
-            'phone_number' => $this->input('phoneNumber')
+            'phone_number' => $this->input('phoneNumber'),
+            'type' => str_contains($this->path(), 'merchant') ? 'merchant' : 'user'
         ]);
     }
 }

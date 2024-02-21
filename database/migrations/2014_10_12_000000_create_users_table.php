@@ -22,6 +22,7 @@ return new class extends Migration {
             $table->string('kyc_status')->default("queued");
             $table->bigInteger('actual_balance')->default(0);
             $table->bigInteger('available_balance')->default(0);
+            $table->bigInteger('reserved_balance')->default(0);
             $table->timestamps();
         });
     }

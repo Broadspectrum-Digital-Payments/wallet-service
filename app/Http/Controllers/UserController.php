@@ -2,12 +2,14 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Controllers\Actions\User\ChangeUserPINAction;
 use App\Http\Controllers\Actions\User\UserKYCAction;
 use App\Http\Controllers\Actions\User\UserLoginAction;
 use App\Http\Controllers\Actions\User\UserNameEnquiryAction;
 use App\Http\Controllers\Actions\User\UserOTPAction;
 use App\Http\Controllers\Actions\User\UserOTPVerificationAction;
 use App\Http\Controllers\Actions\User\UserRegistrationAction;
+use App\Http\Requests\ChangeUserPINRequest;
 use App\Http\Requests\SendUserOTPRequest;
 use App\Http\Requests\UploadFileRequest;
 use App\Http\Requests\UserLoginRequest;
@@ -15,7 +17,10 @@ use App\Http\Requests\UserRegistrationRequest;
 use App\Http\Requests\VerifyUserOTPRequest;
 use App\Http\Resources\FileResource;
 use App\Http\Resources\UserResource;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Psr\Container\ContainerExceptionInterface;
+use Psr\Container\NotFoundExceptionInterface;
 
 class UserController extends Controller
 {
@@ -55,6 +60,21 @@ class UserController extends Controller
     }
 
     public function verifyOTP(VerifyUserOTPRequest $request, UserOTPVerificationAction $action)
+    {
+        return $action->handle($request);
+    }
+
+    /**
+     * Changes the PIN of a user.
+     *
+     * @param ChangeUserPINRequest $request The request object containing the user's new PIN.
+     * @param ChangeUserPINAction $action The action object responsible for handling the change of PIN.
+     *
+     * @return JsonResponse
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
+     */
+    public function changePIN(ChangeUserPINRequest $request, ChangeUserPINAction $action)
     {
         return $action->handle($request);
     }

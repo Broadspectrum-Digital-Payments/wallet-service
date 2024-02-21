@@ -3,7 +3,10 @@
 
 use App\Rules\PINMatchRule;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\Validator;
+use Psr\Container\ContainerExceptionInterface;
+use Psr\Container\NotFoundExceptionInterface;
 use Symfony\Component\HttpFoundation\Response;
 
 function continueSessionMessage(string $message): array
@@ -85,4 +88,39 @@ function successfulResponse(array $data, string $message = "Operation successful
 function jsonResponse(array $data = [], int $status = Response::HTTP_OK): JsonResponse
 {
     return response()->json($data, $status);
+}
+
+/**
+ * @throws ContainerExceptionInterface
+ * @throws NotFoundExceptionInterface
+ */
+function getCachedOTP(string $phoneNumber)
+{
+    return cache()->get($phoneNumber . 'otp');
+}
+
+/**
+ * @throws ContainerExceptionInterface
+ * @throws NotFoundExceptionInterface
+ */
+function checkOTP(string $phoneNumber, string $otp): bool
+{
+    return ($cachedOTP = getCachedOTP($phoneNumber)) && $cachedOTP == $otp;
+}
+
+function getPaginatedData(LengthAwarePaginator $paginator, int $pageSize): array
+{
+    return [
+        'previousPage' => $paginator->previousPageUrl(),
+        'nextPage' => $paginator->nextPageUrl(),
+        'currentPage' => $paginator->currentPage(),
+        'onLastPage' => $paginator->onLastPage(),
+        'onFirstPage' => $paginator->onFirstPage(),
+        'pageSize' => $pageSize
+    ];
+}
+
+function generateStan(): string
+{
+    return now()->format('ymdHisu');
 }

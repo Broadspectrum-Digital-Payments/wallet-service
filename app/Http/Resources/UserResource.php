@@ -22,9 +22,10 @@ class UserResource extends JsonResource
             'type' => $this->type,
             'status' => $this->status,
             'kycStatus' => $this->kyc_status,
-            'actualBalance' => $this->actual_balance / 100,
-            'availableBalance' => $this->actual_balance / 100,
-            'bearerToken' => $this->when($this->bearerToken, fn() => $this->bearerToken)
+            'actualBalance' => number_format($this->actual_balance / 100, 2),
+            'availableBalance' => number_format($this->available_balance / 100, 2),
+            'bearerToken' => $this->when($this->bearerToken, fn() => $this->bearerToken),
+            'files' => FileResource::collection($this->whenLoaded('files'))
         ];
     }
 }

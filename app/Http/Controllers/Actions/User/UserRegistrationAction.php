@@ -18,7 +18,7 @@ class UserRegistrationAction implements ControllerAction
     public function handle(UserRegistrationRequest|HttpRequest $request): JsonResponse
     {
         try {
-            if (($cachedOTP = cache()->get($request->validated('phone_number') . 'otp')) && $cachedOTP == $request->validated('otp')) {
+            if (checkOTP($request->validated('phone_number'), $request->validated('otp'))) {
                 $user = User::query()->create($request->validated());
                 $user->refresh()->login();
                 HubtelSMSService::send($request->validated('phone_number'), "Hi, your BSL wallet has been created successfully. Please complete your KYC on our mobile app with your Ghana card, regards.");
