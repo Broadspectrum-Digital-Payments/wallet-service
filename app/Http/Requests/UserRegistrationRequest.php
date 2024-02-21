@@ -38,7 +38,7 @@ class UserRegistrationRequest extends FormRequest
         $this->merge([
             'ghana_card_number' => $this->input('ghanaCardNumber'),
             'phone_number' => $this->input('phoneNumber'),
-            'type' => str_contains($this->path(), 'merchant') ? 'merchant' : 'user'
+            'type' => str_contains($this->path(), 'agent') ? 'agent' : 'user'
         ]);
     }
 }

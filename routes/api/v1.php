@@ -1,6 +1,6 @@
 <?php
 
-use App\Http\Controllers\MerchantController;
+use App\Http\Controllers\AgentController;
 use App\Http\Controllers\UserTransactionController;
 
 Route::group(['prefix' => 'users'], function () {
@@ -23,7 +23,7 @@ Route::group(['prefix' => 'users'], function () {
     });
 });
 
-Route::post("/merchants/register", [MerchantController::class, 'register']);
+Route::post("/agents/register", [AgentController::class, 'register']);
 
 Route::group(['middleware' => 'auth:sanctum'], function () {
     Route::resource('transactions', UserTransactionController::class)->only('index', 'store', 'show');

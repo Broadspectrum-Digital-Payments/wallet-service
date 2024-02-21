@@ -95,11 +95,21 @@ class User extends Authenticatable
         return 'external_id';
     }
 
+    /**
+     * Retrieves the transactions associated with this model.
+     *
+     * @return HasMany The relation representing the transactions associated with this model.
+     */
     public function transactions(): HasMany
     {
         return $this->hasMany(Transaction::class);
     }
 
+    /**
+     * Updates the actual balance and available balance of the object.
+     *
+     * @return void
+     */
     public function updateBalances(): void
     {
         $this->actual_balance = $this->transactions()->whereNotIn('status', ['failed'])->sum('amount') ?? 0;
@@ -107,12 +117,28 @@ class User extends Authenticatable
         $this->saveQuietly();
     }
 
+    /**
+     * Retrieves the available balance in minor units.
+     *
+     * @return string The available balance converted to a string in minor units.
+     */
     public function getAvailableBalanceInMinorUnits(): string
     {
         return number_format($this->available_balance / 100, 2);
     }
 
-    public function transfer(int $amount, string $accountNumber, string $description, string $stan, bool $p2p = true)
+    /**
+     * Transfer funds to another account.
+     *
+     * @param int $amount The amount to transfer.
+     * @param string $accountNumber The account number to transfer to.
+     * @param string $description The description for the transfer.
+     * @param string $stan The STAN (System Trace Audit Number) for the transfer.
+     * @param bool $p2p Whether the transfer is a person-to-person transfer. Default is true.
+     *
+     * @return null|Transaction Returns a Transaction object if the transfer was successful, otherwise null.
+     */
+    public function transfer(int $amount, string $accountNumber, string $description, string $stan, bool $p2p = true): ?Transaction
     {
         if ($p2p && $user = self::findByPhoneNumber($accountNumber)) {
             return $user->transactions()->create([

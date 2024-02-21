@@ -12,9 +12,18 @@ use Exception;
 use Illuminate\Http\JsonResponse;
 use Symfony\Component\HttpFoundation\Response as ResponseAlias;
 
+/**
+ * Class CreateTransactionAction
+ */
 class CreateTransactionAction implements ControllerAction
 {
 
+    /**
+     * Handles the given HTTP request or CreateUserTransactionRequest.
+     *
+     * @param HttpRequest|CreateUserTransactionRequest $request The request to handle.
+     * @return JsonResponse The JSON response.
+     */
     public function handle(HttpRequest|CreateUserTransactionRequest $request): JsonResponse
     {
         try {
