@@ -14,6 +14,7 @@ use App\Interfaces\USSDMenu;
 use App\Interfaces\USSDRequest;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
+use Psr\SimpleCache\InvalidArgumentException;
 use Random\RandomException;
 
 class Registration implements USSDMenu
@@ -34,10 +35,12 @@ class Registration implements USSDMenu
      * @throws RandomException
      * @throws ContainerExceptionInterface
      * @throws NotFoundExceptionInterface
+     * @throws InvalidArgumentException
      */
     public static function menu(USSDRequest $request, array $sessionData): array
     {
         if ($request->getNewSession() && getCachedOTP($request->getMSISDN())) {
+            info("Continue registration...");
             clearSessionData($request->getSessionId());
             updateSessionData($request->getSessionId(), '1');
             updateSessionData($request->getSessionId(), 'otp');

@@ -42,13 +42,17 @@ function updateSessionData(string $sessionId, mixed $data = null): array
 {
     $sessionData = cache($sessionId) ?? [];
     if ($data) $sessionData[] = $data;
-    cache([$sessionId => $sessionData], now()->addSeconds(180));
+    cache([$sessionId => $sessionData], now()->addSeconds(45));
     return $sessionData;
 }
 
+/**
+ * @throws \Psr\SimpleCache\InvalidArgumentException
+ */
 function clearSessionData(string $sessionId): void
 {
-    cache([$sessionId => null]);
+    info('Clearing cache: ' . $sessionId);
+    cache()->delete($sessionId);
 }
 
 function ussdMenu(array $menuItems): string
