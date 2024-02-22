@@ -26,6 +26,8 @@ class USSDRequestHandler
 
             return ArkeselUSSDResponse::message($request, $response);
         }
+
+        return successfulResponse([], status: 204);
     }
 
     /**
