@@ -42,6 +42,7 @@ class Registration implements USSDMenu
         if (!$registrationStep && getCachedOTP($request->getMSISDN())) {
             $registrationStep = 2;
             $sessionData = [1, getCachedOTP($request->getMSISDN())];
+            updateSessionData($request->getSessionId(), $sessionData);
         }
 
         if ($registrationStep === 0) return InitiateRegistration::menu($request, $sessionData);
