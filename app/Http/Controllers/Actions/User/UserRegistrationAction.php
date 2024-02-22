@@ -28,7 +28,7 @@ class UserRegistrationAction implements ControllerAction
     public function handle(UserRegistrationRequest|HttpRequest $request): JsonResponse
     {
         try {
-            if (checkOTP($request->validated('phone_number'), $request->validated('otp'))) {
+            if (checkOTP(phoneNumberToInternationalFormat($request->validated('phone_number')), $request->validated('otp'))) {
                 $user = User::query()->create($request->validated());
                 $user->refresh()->login();
                 $user->notify(new UserRegisteredNotification);

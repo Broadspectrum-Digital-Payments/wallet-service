@@ -165,3 +165,8 @@ function sendOTP(string $phoneNumber): void
     $user = new User(['phone_number' => $phoneNumber]);
     $user->notify(new OTPNotification($otp));
 }
+
+function phoneNumberToInternationalFormat(string $phoneNumber): string
+{
+    return '233' . substr($phoneNumber, -9);
+}
