@@ -4,33 +4,22 @@ namespace App\Http\Requests\Actions\Registration;
 
 use App\Interfaces\USSDMenu;
 use App\Interfaces\USSDRequest;
-use App\Services\WalletService;
-use Illuminate\Support\Facades\Validator;
+use Psr\Container\ContainerExceptionInterface;
+use Psr\Container\NotFoundExceptionInterface;
 
 class EnterGhanaCardNumber implements USSDMenu
 {
 
+    /**
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
+     */
     public static function menu(USSDRequest $request, array $sessionData): array
     {
-        $validation = self::validateRequest($sessionData[2]);
-
-        if ($validation->fails()) return endedSessionMessage($validation->messages()->first());
+        if (getCachedOTP($request->getMSISDN()) <> trim($sessionData[2])) {
+            return endedSessionMessage(\ussdMenu(['Error', 'The OTP is wrong please check and try again.']));
+        }
 
         return continueSessionMessage("Enter Ghana card number");
-    }
-
-    /**
-     * @param $sessionData
-     * @return \Illuminate\Validation\Validator
-     */
-    public static function validateRequest($sessionData): \Illuminate\Validation\Validator
-    {
-        return Validator::make([
-            'otp' => $sessionData
-        ], [
-            'otp' => ['required', 'digits:6',]
-        ], [
-            'digits_between' => "OTP must be 6 digits long, please try again."
-        ]);
     }
 }
