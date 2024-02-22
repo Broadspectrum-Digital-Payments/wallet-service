@@ -32,18 +32,10 @@ class Registration implements USSDMenu
      *               Returns the menu response from the corresponding registration step class if the step is valid.
      *               Returns the unknown option message if the step is unknown.
      * @throws RandomException
-     * @throws ContainerExceptionInterface
-     * @throws NotFoundExceptionInterface
      */
     public static function menu(USSDRequest $request, array $sessionData): array
     {
         $registrationStep = count($sessionData);
-
-        if (!$registrationStep && getCachedOTP($request->getMSISDN())) {
-            $registrationStep = 2;
-            $sessionData = [1, getCachedOTP($request->getMSISDN())];
-            updateSessionData($request->getSessionId(), $sessionData);
-        }
 
         if ($registrationStep === 0) return InitiateRegistration::menu($request, $sessionData);
         if ($registrationStep === 1) return GenerateOTP::menu($request, $sessionData);

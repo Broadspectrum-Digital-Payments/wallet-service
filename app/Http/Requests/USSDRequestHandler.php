@@ -7,12 +7,18 @@ use App\Http\Requests\Actions\Registration;
 use App\Http\Responses\ArkeselUSSDResponse;
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
+use Psr\Container\ContainerExceptionInterface;
+use Psr\Container\NotFoundExceptionInterface;
 use Random\RandomException;
 
 class USSDRequestHandler
 {
     /**
+     * @param ArkeselUSSDRequest $request
+     * @return JsonResponse
      * @throws RandomException
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
      */
     public function handle(ArkeselUSSDRequest $request): JsonResponse
     {
