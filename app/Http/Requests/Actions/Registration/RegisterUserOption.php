@@ -7,6 +7,7 @@ use App\Interfaces\USSDRequest;
 use App\Models\User;
 use App\Notifications\UserRegisteredNotification;
 use Illuminate\Support\Facades\Notification;
+use Psr\SimpleCache\InvalidArgumentException;
 
 /**
  * Class RegisterUserOption
@@ -31,9 +32,17 @@ class RegisterUserOption implements USSDMenu
      *                           - 4: PIN
      *
      * @return array The USSD response message as an array.
+     * @throws InvalidArgumentException
      */
     public static function menu(USSDRequest $request, array $sessionData): array
     {
+
+        $pinValidation = validatePIN($request->getMSISDN(), $sessionData[5]);
+
+        if ($pinValidation->fails()) {
+            return endedSessionMessage(\ussdMenu([$pinValidation->messages()->first()]));
+        }
+
         $user = User::query()->create([
             'external_id' => uuid_create(),
             'phone_number' => $request->getMSISDN(),

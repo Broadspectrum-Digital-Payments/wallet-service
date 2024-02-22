@@ -10,6 +10,6 @@ class ConfirmPINOption implements USSDMenu
 
     public static function menu(USSDRequest $request, array $sessionData): array
     {
-        return continueSessionMessage("GMoney Registration\nConfirm your PIN:");
+        return continueSessionMessage("GMoney Registration\nConfirm 6 digit PIN:");
     }
 }

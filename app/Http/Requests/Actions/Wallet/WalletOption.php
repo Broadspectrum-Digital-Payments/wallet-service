@@ -9,6 +9,7 @@ use App\Models\User;
 use App\Notifications\PINUpdatedNotification;
 use App\Services\WalletService;
 use Illuminate\Support\Facades\Hash;
+use Psr\SimpleCache\InvalidArgumentException;
 use Random\RandomException;
 
 /**
@@ -84,6 +85,7 @@ class WalletOption implements USSDMenu
      * @param array $sessionData The session data array.
      * @return array The response message as an array.
      * @throws RandomException
+     * @throws InvalidArgumentException
      */
     private static function handleChangPIN(ArkeselUSSDRequest $request, array $sessionData): array
     {
@@ -130,7 +132,7 @@ class WalletOption implements USSDMenu
                 $message = 'The OTP you entered is wrong.';
             }
 
-            if ($user->update(['pin' => trim($sessionData[5])])) {
+            if ($user->update(['pin' => trim($sessionData[4])])) {
                 $user->notify(new PINUpdatedNotification);
                 $message = 'You have successfully changed your PIN. Please dial ' . config('ussd.code') . ' to continue enjoying our service.';
             }

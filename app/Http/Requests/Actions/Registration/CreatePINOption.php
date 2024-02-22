@@ -10,6 +10,6 @@ class CreatePINOption implements USSDMenu
 
     public static function menu(USSDRequest $request, array $sessionData): array
     {
-        return continueSessionMessage("GMoney Registration\nCreate new PIN:");
+        return continueSessionMessage("GMoney Registration\nCreate your new 6 digit PIN:");
     }
 }
