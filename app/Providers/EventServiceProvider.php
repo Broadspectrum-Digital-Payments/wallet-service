@@ -23,6 +23,12 @@ class EventServiceProvider extends ServiceProvider
         ],
         'App\Events\UserBalanceUpdatedEvent' => [
             'App\Listeners\UserBalanceUpdatedListener'
+        ],
+        'App\Events\UserStatusUpdatedEvent' => [
+            'App\Listeners\UserStatusUpdatedListener'
+        ],
+        'App\Events\UserKYCStatusUpdatedEvent' => [
+            'App\Listeners\UserKYCStatusUpdatedListener'
         ]
     ];
 

@@ -8,9 +8,9 @@ class HubtelSMSService
 {
     public static function send(object $notifiable, $notification)
     {
-        $response = Http::withBasicAuth("gjycilyy", "dhtthlyz")
-            ->post("https://sms.hubtel.com/v1/messages/send", [
-                'From' => 'BDP',
+        $response = Http::withBasicAuth(config('hubtel.sms.clientId'), config('hubtel.sms.clientSecret'))
+            ->post(config('hubtel.sms.endpoint'), [
+                'From' => config('hubtel.sms.senderId'),
                 'To' => $notifiable->phone_number,
                 'Content' => $notification->toSMS($notifiable)
             ]);

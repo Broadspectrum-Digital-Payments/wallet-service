@@ -2,6 +2,8 @@
 
 namespace App\Observers;
 
+use App\Events\UserKYCStatusUpdatedEvent;
+use App\Events\UserStatusUpdatedEvent;
 use App\Models\User;
 
 class UserObserver
@@ -23,7 +25,8 @@ class UserObserver
      */
     public function updated(User $user): void
     {
-//        if ($user->isDirty('available_balance'))
+        if ($user->isDirty('status')) event(new UserStatusUpdatedEvent($user));
+        if ($user->isDirty('kyc_status')) event(new UserKYCStatusUpdatedEvent($user));
     }
 
     /**
