@@ -24,8 +24,17 @@ class UserLoginRequest extends FormRequest implements HttpRequest
     public function rules(): array
     {
         return [
-            'phoneNumber' => ['required', 'digits:10', 'exists:users,phone_number'],
+            'phoneNumber' => ['required', 'digits:12', 'exists:users,phone_number'],
             'pin' => ['required', 'digits:6']
+        ];
+    }
+
+    public function messages(): array
+    {
+        return [
+            'phoneNumber' => [
+                'digits' => 'Phone number must be 10 digits'
+            ]
         ];
     }
 
