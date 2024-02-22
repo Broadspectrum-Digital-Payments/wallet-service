@@ -11,6 +11,7 @@ class TransactionObserver
     public function creating(Transaction $transaction): void
     {
         $transaction->external_id = uuid_create();
+        $transaction->fee = $transaction->fee ?? 0;
 
         if (in_array($transaction->type, Transaction::DEBIT_TYPES)) {
             $transaction->amount = $transaction->amount * -1;
