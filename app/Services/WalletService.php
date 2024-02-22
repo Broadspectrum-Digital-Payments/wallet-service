@@ -2,22 +2,18 @@
 
 namespace App\Services;
 
-use GuzzleHttp\Promise\PromiseInterface;
 use Illuminate\Http\Client\Response;
 use Illuminate\Support\Facades\Http;
 
 class WalletService
 {
-    private const BASE_URI = 'http://api.bsl.com.gh:8080/rest';
 
     public static function generateOTP(string $phoneNumber): bool
     {
         return self::executePostRequest(
-            endpoint: '/members/registration/generate-otp',
+            endpoint: '/users/otp',
             data: [
-                'medium' => $phoneNumber,
-                'actionType' => 'Registration',
-                'otpToMobile' => true
+                'phoneNumber' => $phoneNumber
             ]
         )->successful();
     }
@@ -30,22 +26,17 @@ class WalletService
      *
      * @return Response The response object obtained from the POST request.
      */
-    private static function executePostRequest(string $endpoint, array $data, string $username = "", string $password = ""): Response
+    private static function executePostRequest(string $endpoint, array $data, string $token = ""): Response
     {
-        info("PaytabsWalletService Request", ['endpoint' => $endpoint, 'data', $data]);
 
-        $response = Http::withBasicAuth($username, $password)->post(self::BASE_URI . $endpoint, $data);
+        $url = config('app.url') . '/v1' . $endpoint;
 
-        info("PaytabsWalletService Response", $response->json());
+        info("WalletService Request", ['url' => $url, 'data', $data]);
 
-        return $response;
-    }
+        $response = Http::withToken($token)->post($url, $data);
 
-    private static function putRequest(string $endpoint, array $data, string $phoneNumber, string $PIN): PromiseInterface|Response
-    {
-        info("PaytabsWalletService Request", ['endpoint' => $endpoint, 'data', $data]);
-        $response = Http::withHeader("Paynet-Session-Token", self::getSessionId($phoneNumber, $PIN))->put($endpoint, $data);
-        info("PaytabsWalletService Response", $response->json());
+        info("WalletService Response", $response->json());
+
         return $response;
     }
 
@@ -123,12 +114,11 @@ class WalletService
     private static function login(string $phoneNumber, string $PIN): string
     {
         $response = self::executePostRequest(
-            endpoint: "/access/login",
+            endpoint: "/users/login",
             data: [
-                "authType" => "SESSION"
-            ],
-            username: $phoneNumber,
-            password: $PIN
+                "phoneNumber" => $phoneNumber,
+                "pin" => $PIN
+            ]
         );
 
         return ($response->successful() && $response->json('status') && !$response->json('sessionExpired')) ?

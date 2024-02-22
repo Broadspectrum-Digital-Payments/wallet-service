@@ -5,6 +5,8 @@ namespace App\Http\Controllers\Actions\User;
 use App\Http\Requests\SendUserOTPRequest;
 use App\Interfaces\ControllerAction;
 use App\Interfaces\HttpRequest;
+use App\Models\User;
+use App\Notifications\OTPNotification;
 use App\Services\HubtelSMSService;
 use Exception;
 use Illuminate\Http\JsonResponse;
@@ -20,7 +22,9 @@ class UserOTPAction implements ControllerAction
 
             cache()->put($phoneNumber . "otp", $otp, now()->addMinutes(3));
 
-            $response = HubtelSMSService::send($phoneNumber, "Your BSL wallet verification code is: " . $otp);
+            $user = new User(['phone_number' => $phoneNumber]);
+
+            $user->notify(new OTPNotification($otp));
 
             if (!empty($response) && $response['messageId'] ?? null) {
                 return successfulResponse([], "OTP sent to " . $phoneNumber);

@@ -124,14 +124,22 @@ function checkOTP(string $phoneNumber, string $otp): bool
  */
 function getPaginatedData(LengthAwarePaginator $paginator, int $pageSize): array
 {
+    $toArray = $paginator->toArray();
     return [
+        'firstPageUrl' => $toArray['first_page_url'],
         'previousPage' => $paginator->previousPageUrl(),
         'nextPage' => $paginator->nextPageUrl(),
+        'lastPageUrl' => $toArray['last_page_url'],
         'currentPage' => $paginator->currentPage(),
         'onLastPage' => $paginator->onLastPage(),
         'onFirstPage' => $paginator->onFirstPage(),
         'total' => $paginator->total(),
-        'pageSize' => $pageSize
+        'pageSize' => $pageSize,
+        'path' => $paginator->path(),
+        'from' => $paginator->toArray()['from'],
+        'to' => $paginator->toArray()['to'],
+        'numberOfRecords' => $paginator->count(),
+        'hasPages' => $paginator->hasPages()
     ];
 }
 
