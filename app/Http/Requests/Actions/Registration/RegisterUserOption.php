@@ -7,6 +7,9 @@ use App\Interfaces\USSDRequest;
 use App\Models\User;
 use App\Notifications\UserRegisteredNotification;
 use Illuminate\Support\Facades\Notification;
+use Illuminate\Support\Facades\Validator;
+use Psr\Container\ContainerExceptionInterface;
+use Psr\Container\NotFoundExceptionInterface;
 use Psr\SimpleCache\InvalidArgumentException;
 
 /**
@@ -33,11 +36,22 @@ class RegisterUserOption implements USSDMenu
      *
      * @return array The USSD response message as an array.
      * @throws InvalidArgumentException
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
      */
     public static function menu(USSDRequest $request, array $sessionData): array
     {
+        if (getCachedOTP($request->getMSISDN()) <> trim($sessionData[2])) {
+            return endedSessionMessage(\ussdMenu(['Error', 'The OTP is wrong please check and try again.']));
+        }
 
-        $pinValidation = validatePIN($request->getMSISDN(), $sessionData[5]);
+        $pinValidation = Validator::make([
+            'pin' => $sessionData[5],
+            'pin_confirmation' => $sessionData[5]
+        ], [
+            'pin' => ['required', 'digits:6'],
+            'pin_confirmation' => ['required', 'same:pin']
+        ]);
 
         if ($pinValidation->fails()) {
             return endedSessionMessage(\ussdMenu([$pinValidation->messages()->first()]));
