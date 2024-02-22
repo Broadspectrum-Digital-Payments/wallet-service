@@ -20,7 +20,7 @@ class UserLoginAction implements ControllerAction
      */
     public function handle(UserLoginRequest|HttpRequest $request): JsonResponse
     {
-        $user = User::query()->where('phone_number', '=', $request->validated('phoneNumber'))->first();
+        $user = User::query()->where('phone_number', '=', phoneNumberToInternationalFormat($request->validated('phoneNumber')))->first();
         if (Hash::check($request->validated('pin'), $user->pin)) {
             $user->login();
             return successfulResponse(

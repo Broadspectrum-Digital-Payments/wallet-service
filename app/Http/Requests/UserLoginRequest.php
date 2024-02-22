@@ -25,7 +25,12 @@ class UserLoginRequest extends FormRequest implements HttpRequest
     {
         return [
             'phoneNumber' => ['required', 'digits:10', 'exists:users,phone_number'],
-            'pin' => ['required', 'digits:4']
+            'pin' => ['required', 'digits:6']
         ];
+    }
+
+    protected function prepareForValidation(): void
+    {
+        $this->merge(['phoneNumber' => phoneNumberToInternationalFormat($this->input('phoneNumber'))]);
     }
 }
