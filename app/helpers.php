@@ -1,8 +1,6 @@
 <?php
 
 
-use App\Http\Requests\SendUserOTPRequest;
-use App\Interfaces\HttpRequest;
 use App\Models\User;
 use App\Notifications\OTPNotification;
 use App\Rules\PINMatchRule;
@@ -44,7 +42,7 @@ function updateSessionData(string $sessionId, mixed $data = null): array
 {
     $sessionData = cache($sessionId) ?? [];
     if ($data) $sessionData[] = $data;
-    cache([$sessionId => $sessionData], now()->addSeconds(30));
+    cache([$sessionId => $sessionData], now()->addSeconds(180));
     return $sessionData;
 }
 
