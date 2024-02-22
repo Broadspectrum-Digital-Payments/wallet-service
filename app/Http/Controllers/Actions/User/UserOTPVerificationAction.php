@@ -7,18 +7,26 @@ use App\Interfaces\ControllerAction;
 use App\Interfaces\HttpRequest;
 use App\Services\HubtelSMSService;
 use Illuminate\Http\JsonResponse;
+use Psr\Container\ContainerExceptionInterface;
+use Psr\Container\NotFoundExceptionInterface;
+use Psr\SimpleCache\InvalidArgumentException;
 use Symfony\Component\HttpFoundation\Response as ResponseAlias;
 
 class UserOTPVerificationAction implements ControllerAction
 {
 
+    /**
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
+     * @throws InvalidArgumentException
+     */
     public function handle(HttpRequest|VerifyUserOTPRequest $request): JsonResponse
     {
         try {
             $phoneNumber = $request->validated('phoneNumber');
             $otp = $request->validated('otp');
 
-            if ($cachedOTP = cache()->get($phoneNumber . 'otp')) {
+            if ($cachedOTP = getCachedOTP($phoneNumber)) {
                 if ($cachedOTP == $otp) {
                     cache()->delete($phoneNumber . 'otp');
                     HubtelSMSService::send($phoneNumber, "You have successfully verified your phone number.");
