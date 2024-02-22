@@ -4,10 +4,15 @@ namespace App\Http\Requests\Actions\Transactions;
 
 use App\Interfaces\USSDMenu;
 use App\Interfaces\USSDRequest;
+use App\Models\User;
+use Psr\SimpleCache\InvalidArgumentException;
 
 class TransactionsOption implements USSDMenu
 {
 
+    /**
+     * @throws InvalidArgumentException
+     */
     public static function menu(USSDRequest $request, array $sessionData): array
     {
         if (count($sessionData) === 2) {
@@ -16,18 +21,22 @@ class TransactionsOption implements USSDMenu
                 clearSessionData($request->getSessionId());
                 return endedSessionMessage($validatePIN->messages()->first());
             }
+
+            $user = User::findByPhoneNumber($request->getMSISDN());
+
+            $transactions = $user->transactions()->latest()->take(4)->get();
+
+            $transactionsToArray = $transactions->map(fn($transaction, $i) =>  $i + 1 . ". {$transaction->created_at->format('Y-m-d')} {$transaction->type} GHS {$transaction->getAmountInMajorUnits()}");
+
             return endedSessionMessage(ussdMenu([
-                "G-Money Transactions",
-                "2024-02-09 Transfer GHS 200.00",
-                "2024-02-09 Transfer GHS 50.00",
-                "2024-02-09 Top Up GHS 130.00",
-                "2024-02-09 Withdrawal GHS 200.00",
+                "Transactions",
+                ...$transactionsToArray
             ]));
         }
 
         return continueSessionMessage(ussdMenu([
             "Transactions",
-            "Enter your PIN:"
+            "Enter your 6 digit PIN:"
         ]));
     }
 }

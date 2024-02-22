@@ -27,6 +27,8 @@ class WalletOption implements USSDMenu
      * @param array $sessionData The session data associated with the request.
      *
      * @return array The response message as an array.
+     * @throws InvalidArgumentException
+     * @throws RandomException
      */
     public static function menu(USSDRequest $request, array $sessionData): array
     {

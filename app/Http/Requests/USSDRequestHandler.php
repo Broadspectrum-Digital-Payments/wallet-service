@@ -9,6 +9,7 @@ use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
+use Psr\SimpleCache\InvalidArgumentException;
 use Random\RandomException;
 
 class USSDRequestHandler
@@ -19,6 +20,7 @@ class USSDRequestHandler
      * @throws RandomException
      * @throws ContainerExceptionInterface
      * @throws NotFoundExceptionInterface
+     * @throws InvalidArgumentException
      */
     public function handle(ArkeselUSSDRequest $request): JsonResponse
     {

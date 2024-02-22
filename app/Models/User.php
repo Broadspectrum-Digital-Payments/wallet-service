@@ -68,6 +68,11 @@ class User extends Authenticatable
         $this->bearerToken = $token->plainTextToken;
     }
 
+    public function setPhoneNumberAttribute(string $phoneNumber): void
+    {
+        $this->attributes['phone_number'] = '233' . substr($phoneNumber, -9);
+    }
+
     public function setPinAttribute(string $pin): void
     {
         $this->attributes['pin'] = bcrypt(trim($pin));

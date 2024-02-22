@@ -25,6 +25,6 @@ class PINMatchRule implements ValidationRule
      */
     public function validate(string $attribute, mixed $value, Closure $fail): void
     {
-        if (!Hash::check($value, $this->user->pin)) $fail("Wrong PIN, please try again1.");
+        if (!Hash::check($value, $this->user->pin)) $fail("Wrong PIN, please try again.");
     }
 }

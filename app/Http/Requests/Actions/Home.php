@@ -8,10 +8,16 @@ use App\Http\Requests\Actions\Wallet\WalletOption;
 use App\Http\Requests\Actions\Withdraw\WithdrawOption;
 use App\Interfaces\USSDMenu;
 use App\Interfaces\USSDRequest;
+use Psr\SimpleCache\InvalidArgumentException;
+use Random\RandomException;
 
 class Home implements USSDMenu
 {
 
+    /**
+     * @throws InvalidArgumentException
+     * @throws RandomException
+     */
     public static function menu(USSDRequest $request, array $sessionData): array
     {
         return match ($sessionData[0] ?? null) {
