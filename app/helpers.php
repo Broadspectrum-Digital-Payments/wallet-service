@@ -103,7 +103,7 @@ function jsonResponse(array $data = [], int $status = Response::HTTP_OK): JsonRe
  */
 function getCachedOTP(string $phoneNumber)
 {
-    return cache()->get($phoneNumber . 'otp');
+    return cache()->get(phoneNumberToInternationalFormat($phoneNumber) . 'otp');
 }
 
 /**
@@ -161,7 +161,7 @@ function generateStan(): string
 function sendOTP(string $phoneNumber): void
 {
     $otp = random_int(100000, 999999);
-    cache()->put($phoneNumber . "otp", $otp, now()->addMinutes(3));
+    cache()->put(phoneNumberToInternationalFormat($phoneNumber) . "otp", $otp, now()->addMinutes(3));
     $user = new User(['phone_number' => $phoneNumber]);
     $user->notify(new OTPNotification($otp));
 }
