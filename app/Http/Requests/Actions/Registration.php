@@ -44,6 +44,7 @@ class Registration implements USSDMenu
             clearSessionData($request->getSessionId());
             updateSessionData($request->getSessionId(), '1');
             updateSessionData($request->getSessionId(), 'otp');
+            $sessionData = ['1', 'otp'];
         }
 
         $registrationStep = count($sessionData);
