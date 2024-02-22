@@ -12,6 +12,8 @@ use App\Http\Requests\Actions\Registration\InitiateRegistration;
 use App\Http\Requests\Actions\Registration\RegisterUserOption;
 use App\Interfaces\USSDMenu;
 use App\Interfaces\USSDRequest;
+use Psr\Container\ContainerExceptionInterface;
+use Psr\Container\NotFoundExceptionInterface;
 use Random\RandomException;
 
 class Registration implements USSDMenu
@@ -30,10 +32,14 @@ class Registration implements USSDMenu
      *               Returns the menu response from the corresponding registration step class if the step is valid.
      *               Returns the unknown option message if the step is unknown.
      * @throws RandomException
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
      */
     public static function menu(USSDRequest $request, array $sessionData): array
     {
         $registrationStep = count($sessionData);
+
+        if (!$registrationStep && getCachedOTP($request->getMSISDN())) $registrationStep = 2;
 
         if ($registrationStep === 0) return InitiateRegistration::menu($request, $sessionData);
         if ($registrationStep === 1) return GenerateOTP::menu($request, $sessionData);
