@@ -7,21 +7,31 @@ use App\Http\Resources\UserResource;
 use App\Interfaces\ControllerAction;
 use App\Interfaces\HttpRequest;
 use App\Models\User;
-use App\Services\HubtelSMSService;
+use App\Notifications\UserRegisteredNotification;
 use Exception;
 use Illuminate\Http\JsonResponse;
+use Psr\Container\ContainerExceptionInterface;
+use Psr\Container\NotFoundExceptionInterface;
 use Symfony\Component\HttpFoundation\Response as ResponseAlias;
 
 class UserRegistrationAction implements ControllerAction
 {
 
+    /**
+     * Handle the user registration request.
+     *
+     * @param UserRegistrationRequest|HttpRequest $request The user registration request or HTTP request.
+     * @return JsonResponse The JSON response with the registration status.
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
+     */
     public function handle(UserRegistrationRequest|HttpRequest $request): JsonResponse
     {
         try {
             if (checkOTP($request->validated('phone_number'), $request->validated('otp'))) {
                 $user = User::query()->create($request->validated());
                 $user->refresh()->login();
-                HubtelSMSService::send($request->validated('phone_number'), "Hi, your BSL wallet has been created successfully. Please complete your KYC on our mobile app with your Ghana card, regards.");
+                $user->notify(new UserRegisteredNotification);
                 return successfulResponse(['data' => new UserResource($user)], 'User registered.', ResponseAlias::HTTP_CREATED);
             }
 

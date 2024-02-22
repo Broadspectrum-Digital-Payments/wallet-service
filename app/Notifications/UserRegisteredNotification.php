@@ -4,21 +4,12 @@ namespace App\Notifications;
 
 use App\Notifications\Channels\HubtelSMSService;
 use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
-class PINUpdatedNotification extends Notification
+class UserRegisteredNotification extends Notification
 {
     use Queueable;
-
-    /**
-     * Create a new notification instance.
-     */
-    public function __construct()
-    {
-        //
-    }
 
     /**
      * Get the notification's delivery channels.
@@ -30,9 +21,9 @@ class PINUpdatedNotification extends Notification
         return [HubtelSMSService::class];
     }
 
-    public function toSMS(object $notifiable): string
+    public function toSMS($notifiable): string
     {
-        return "Hi $notifiable->name, you have successfully updated your PIN. Please login with the new PIN to enjoy our service.";
+        return "Congratulation! Your G - Money account has been created successfully. Please complete your KYC on our mobile app, regards.";
     }
 
     /**

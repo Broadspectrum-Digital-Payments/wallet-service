@@ -2,7 +2,7 @@
 
 namespace App\Notifications;
 
-use App\Services\HubtelSMSService;
+use App\Notifications\Channels\HubtelSMSService;
 use Illuminate\Bus\Queueable;
 use Illuminate\Notifications\Notification;
 

@@ -25,6 +25,7 @@ class UserResource extends JsonResource
             'actualBalance' => number_format($this->actual_balance / 100, 2),
             'availableBalance' => number_format($this->available_balance / 100, 2),
             'bearerToken' => $this->when($this->bearerToken, fn() => $this->bearerToken),
+            'createdAt' => $this->created_at,
             'files' => FileResource::collection($this->whenLoaded('files'))
         ];
     }

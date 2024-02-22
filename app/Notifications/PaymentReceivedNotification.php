@@ -33,7 +33,7 @@ class PaymentReceivedNotification extends Notification
 
     public function toSMS(object $notifiable): string
     {
-        return "You have received GHS {$this->transaction->getAmountInMajorUnits()} from {$this->transaction->account_name} [{$this->transaction->account_number}]. Your available balance is GHS {$this->transaction->user->getAvailableBalanceInMinorUnits()}. Transaction ID: {$this->transaction->stan}. Fee: GHS 0";
+        return "You have received GHS {$this->transaction->getAmountInMajorUnits()} from {$this->transaction->account_name} [{$this->transaction->account_number}]. Your available balance is GHS {$this->transaction->user->getAvailableBalanceInMajorUnits()}. Transaction ID: {$this->transaction->stan}. Fee: GHS 0";
     }
 
     /**

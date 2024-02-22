@@ -6,6 +6,7 @@ use App\Models\User;
 use Closure;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Translation\PotentiallyTranslatedString;
 
 class PINMatchRule implements ValidationRule
@@ -24,6 +25,6 @@ class PINMatchRule implements ValidationRule
      */
     public function validate(string $attribute, mixed $value, Closure $fail): void
     {
-        if ($value <> $this->user->pin) $fail("Wrong PIN, please try again.");
+        if (!Hash::check($value, $this->user->pin)) $fail("Wrong PIN, please try again1.");
     }
 }

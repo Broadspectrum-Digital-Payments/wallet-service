@@ -4,18 +4,19 @@ namespace App\Services;
 
 use Illuminate\Http\Client\Response;
 use Illuminate\Support\Facades\Http;
+use Random\RandomException;
 
 class WalletService
 {
 
+    /**
+     * @throws RandomException
+     */
     public static function generateOTP(string $phoneNumber): bool
     {
-        return self::executePostRequest(
-            endpoint: '/users/otp',
-            data: [
-                'phoneNumber' => $phoneNumber
-            ]
-        )->successful();
+        info("Generating OTP");
+        sendOTP($phoneNumber);
+        return true;
     }
 
     /**
@@ -28,7 +29,6 @@ class WalletService
      */
     private static function executePostRequest(string $endpoint, array $data, string $token = ""): Response
     {
-
         $url = config('app.url') . '/v1' . $endpoint;
 
         info("WalletService Request", ['url' => $url, 'data', $data]);

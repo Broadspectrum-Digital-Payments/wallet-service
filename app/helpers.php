@@ -1,12 +1,17 @@
 <?php
 
 
+use App\Http\Requests\SendUserOTPRequest;
+use App\Interfaces\HttpRequest;
+use App\Models\User;
+use App\Notifications\OTPNotification;
 use App\Rules\PINMatchRule;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\Validator;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
+use Random\RandomException;
 use Symfony\Component\HttpFoundation\Response;
 
 function continueSessionMessage(string $message): array
@@ -66,7 +71,7 @@ function validatePIN(string $phoneNumber, string $pin)
 
 function errorResponse(string $message = "Something went wrong, please try again later.", int $status = Response::HTTP_INTERNAL_SERVER_ERROR): JsonResponse
 {
-    return \jsonResponse(
+    return jsonResponse(
         [
             'success' => false,
             'message' => $message
@@ -146,4 +151,15 @@ function getPaginatedData(LengthAwarePaginator $paginator, int $pageSize): array
 function generateStan(): string
 {
     return now()->format('ymdHisu');
+}
+
+/**
+ * @throws RandomException
+ */
+function sendOTP(string $phoneNumber): void
+{
+    $otp = random_int(100000, 999999);
+    cache()->put($phoneNumber . "otp", $otp, now()->addMinutes(3));
+    $user = new User(['phone_number' => $phoneNumber]);
+    $user->notify(new OTPNotification($otp));
 }

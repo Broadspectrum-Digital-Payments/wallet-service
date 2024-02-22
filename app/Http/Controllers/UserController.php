@@ -56,6 +56,7 @@ class UserController extends Controller
 
     public function sendOTP(SendUserOTPRequest $request, UserOTPAction $action)
     {
+        info("OTP Request Received.");
         return $action->handle($request);
     }
 

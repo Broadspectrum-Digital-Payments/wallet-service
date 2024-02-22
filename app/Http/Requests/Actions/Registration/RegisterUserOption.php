@@ -5,28 +5,51 @@ namespace App\Http\Requests\Actions\Registration;
 use App\Interfaces\USSDMenu;
 use App\Interfaces\USSDRequest;
 use App\Models\User;
+use App\Notifications\UserRegisteredNotification;
+use Illuminate\Support\Facades\Notification;
 
+/**
+ * Class RegisterUserOption
+ *
+ * This class handles the registration of a new user in the GMoney system.
+ *
+ * Implements USSDMenu interface to define the menu functionality.
+ */
 class RegisterUserOption implements USSDMenu
 {
 
+    /**
+     * Process the menu request and register a new user in the GMoney system.
+     *
+     * @param USSDRequest $request The USSD request object.
+     * @param array $sessionData The session data array containing user information.
+     *                           The array should have the following keys:
+     *                           - 0: Session ID
+     *                           - 1: Service Code
+     *                           - 2: User Input
+     *                           - 3: Ghana Card Number
+     *                           - 4: PIN
+     *
+     * @return array The USSD response message as an array.
+     */
     public static function menu(USSDRequest $request, array $sessionData): array
     {
-        $user = [
+        $user = User::query()->create([
             'external_id' => uuid_create(),
             'phone_number' => $request->getMSISDN(),
+            'ghana_card_number' => $sessionData[3],
             'name' => $sessionData[4],
-            'email' => $sessionData[5],
-            'pin' => $sessionData[6]
-        ];
-
-//        $walletCreated = ($response = PaytabsWalletService::registerUser($sessionData[3], $user['name'], $user['email'], $user['phone_number'], $user['pin'])) && ($response['status'] ?? null);
-        $userCreated = User::query()->create($user);
-
-        if ($userCreated) {
-            return endedSessionMessage("GMoney Registration\nCongratulations! You have successfully registered on GMoney. Please dial " . config('ussd.code') . ' to access your wallet.');
-        }
+            'pin' => $sessionData[5],
+            'type' => 'user'
+        ]);
 
         clearSessionData($request->getSessionId());
+
+        if ($user) {
+            Notification::send($user, new UserRegisteredNotification);
+            return endedSessionMessage("G - Money Registration\nAccount created successfully. Please dial " . config('ussd.code') . ' to access your wallet.');
+        }
+
         return endedSessionMessage("GMoney Registration\nOops! An error occurred, please wait a while and try again.");
     }
 }

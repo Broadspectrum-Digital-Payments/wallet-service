@@ -122,7 +122,7 @@ class User extends Authenticatable
      *
      * @return string The available balance converted to a string in minor units.
      */
-    public function getAvailableBalanceInMinorUnits(): string
+    public function getAvailableBalanceInMajorUnits(): string
     {
         return number_format($this->available_balance / 100, 2);
     }

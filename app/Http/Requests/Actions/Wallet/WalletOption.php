@@ -5,7 +5,11 @@ namespace App\Http\Requests\Actions\Wallet;
 use App\Http\Requests\ArkeselUSSDRequest;
 use App\Interfaces\USSDMenu;
 use App\Interfaces\USSDRequest;
+use App\Models\User;
+use App\Notifications\PINUpdatedNotification;
 use App\Services\WalletService;
+use Illuminate\Support\Facades\Hash;
+use Random\RandomException;
 
 /**
  * Class WalletOption
@@ -56,12 +60,11 @@ class WalletOption implements USSDMenu
         ]));
 
         $pinValidation = validatePIN($request->getMSISDN(), last($sessionData));
-        $message = ($pinValidation->fails()) ? $pinValidation->messages()->first() : ussdMenu([
-            "Check balance",
-            "Your account balance is GHS 56.32"
-        ]);
+
+        $message = ($pinValidation->fails()) ? $pinValidation->messages()->first() : self::getUserAvailableBalance($request->getMSISDN());
 
         clearSessionData($request->getSessionId());
+
         return endedSessionMessage($message);
     }
 
@@ -80,9 +83,12 @@ class WalletOption implements USSDMenu
      * @param ArkeselUSSDRequest $request The USSD request object.
      * @param array $sessionData The session data array.
      * @return array The response message as an array.
+     * @throws RandomException
      */
     private static function handleChangPIN(ArkeselUSSDRequest $request, array $sessionData): array
     {
+        info($sessionData);
+
         if (self::isSecondLevelOption($sessionData)) return continueSessionMessage(ussdMenu([
             "Change PIN",
             "Enter current PIN:"
@@ -100,26 +106,38 @@ class WalletOption implements USSDMenu
 
         if (self::isFifthLevelOption($sessionData)) {
             // Send change PIN request, this triggers an OTP
-            if (($response = WalletService::changePIN($sessionData[3], $sessionData[4])) && $response['status'] ?? null) {
-                sleep(2);
-                return continueSessionMessage(ussdMenu([
-                    "Change PIN",
-                    "Enter the OTP sent to your number:"
-                ]));
-            }
-
-            return operationFailedMessage();
+            sendOTP($request->getMSISDN());
+            return continueSessionMessage(ussdMenu([
+                "Change PIN",
+                "Enter the OTP sent to your number:"
+            ]));
         }
 
-        if (self::isSixthLevelOption($sessionData)) {
-            // Send PIN change confirmation
-            $message = (($response = WalletService::confirmChangePIN($sessionData[3], $sessionData[4], $sessionData[5])) && $response['status'] ?? null) ?
-                "You have successfully changed your PIN" :
-                "PIN change failed, please try again later";
+        $user = User::findByPhoneNumber($request->getMSISDN());
 
-            return endedSessionMessage(\ussdMenu([
-                $message
-            ]));
+        if (self::isSixthLevelOption($sessionData)) {
+            $message = "PIN change failed, please try again later";
+
+            if (!Hash::check($sessionData[2], $user->pin)) {
+                $message = 'The current PIN your ended is incorrect';
+            }
+
+            if (trim($sessionData[3]) <> trim($sessionData[4])) {
+                $message = 'PIN mismatch, please try again.';
+            }
+
+            if (!checkOTP($request->getMSISDN(), trim($sessionData[5]))) {
+                $message = 'The OTP you entered is wrong.';
+            }
+
+            if ($user->update(['pin' => trim($sessionData[5])])) {
+                $user->notify(new PINUpdatedNotification);
+                $message = 'You have successfully changed your PIN. Please dial ' . config('ussd.code') . ' to continue enjoying our service.';
+            }
+
+            clearSessionData($request->getSessionId());
+
+            return endedSessionMessage(\ussdMenu([$message]));
         }
 
         return unknownOptionMessage();
@@ -159,5 +177,19 @@ class WalletOption implements USSDMenu
     private static function isSixthLevelOption(array $sessionData): bool
     {
         return count($sessionData) === 6;
+    }
+
+    /**
+     * @param string $phoneNumber
+     * @return string
+     */
+    public static function getUserAvailableBalance(string $phoneNumber): string
+    {
+        $user = User::query()->where('phone_number', '=', $phoneNumber)->first();
+
+        return ussdMenu([
+            "Check balance",
+            "Your account balance is GHS {$user->getAvailableBalanceInMajorUnits()}"
+        ]);
     }
 }
