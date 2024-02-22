@@ -9,6 +9,7 @@ use App\Models\User;
 use App\Notifications\PINUpdatedNotification;
 use App\Services\WalletService;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Validator;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
 use Psr\SimpleCache\InvalidArgumentException;
@@ -121,9 +122,16 @@ class WalletOption implements USSDMenu
         }
 
         if (self::isFifthLevelOption($sessionData)) {
+            $pinValidation = Validator::make([
+                'pin' => trim($sessionData[3]),
+                'pin_confirmation' => trim($sessionData[4])
+            ], [
+                'pin' => ['required', 'digits:6'],
+                'pin_confirmation' => ['same:pin'],
+            ]);
 
-            if (trim($sessionData[3]) <> trim($sessionData[4])) {
-                return endedSessionMessage('PIN mismatch, please try again.');
+            if ($pinValidation->fails()) {
+                return endedSessionMessage($pinValidation->messages()->first());
             }
             // Send change PIN request, this triggers an OTP
             sendOTP($request->getMSISDN());
