@@ -9,8 +9,10 @@ use App\Models\User;
 use App\Notifications\PINUpdatedNotification;
 use Exception;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Response;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
+use Symfony\Component\HttpFoundation\Response as ResponseAlias;
 
 /**
  * Class ChangeUserPINAction
@@ -30,14 +32,14 @@ class ChangeUserPINAction implements ControllerAction
     public function handle(HttpRequest|ChangeUserPINRequest $request): JsonResponse
     {
         try {
-            if (checkOTP($request->validated('phoneNumber'), $request->validated('otp'))) {
+            if (checkOTP(phoneNumberToInternationalFormat($request->validated('phoneNumber')), $request->validated('otp'))) {
                 $user = User::findByPhoneNumber($request->validated('phoneNumber'));
                 $user->update(['pin' => $request->validated('pin')]);
                 $user->notify(new PINUpdatedNotification);
                 return successfulResponse([], "You have successfully updated your PIN.");
             }
 
-            return errorResponse("OTP is wrong, please check and try again.");
+            return errorResponse("OTP is wrong, please check and try again.", ResponseAlias::HTTP_BAD_REQUEST);
 
         } catch (Exception $e) {
             report($e);

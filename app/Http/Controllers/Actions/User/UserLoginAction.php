@@ -24,7 +24,7 @@ class UserLoginAction implements ControllerAction
         if (Hash::check($request->validated('pin'), $user->pin)) {
             $user->login();
             return successfulResponse(
-                data: ["data" => new UserResource($user)], message: "Login successful"
+                data: ["data" => new UserResource($user->load('files'))], message: "Login successful"
             );
         }
 
