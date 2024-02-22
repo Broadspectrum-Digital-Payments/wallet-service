@@ -26,11 +26,10 @@ class TransactionsOption implements USSDMenu
 
             $transactions = $user->transactions()->latest()->take(4)->get();
 
-            $transactionsToArray = $transactions->map(fn($transaction, $i) =>  $i + 1 . ". {$transaction->created_at->format('Y-m-d')} {$transaction->type} GHS {$transaction->getAmountInMajorUnits()}");
+            $transactionsToArray = $transactions->map(fn($transaction, $i) => $i + 1 . ". {$transaction->created_at->format('Y-m-d')} {$transaction->type} GHS {$transaction->getAmountInMajorUnits()}");
 
             return endedSessionMessage(ussdMenu([
-                "Transactions",
-                ...$transactionsToArray
+                empty($transactionsToArray) ? "No transactions found." : "Transactions", ...$transactionsToArray
             ]));
         }
 
