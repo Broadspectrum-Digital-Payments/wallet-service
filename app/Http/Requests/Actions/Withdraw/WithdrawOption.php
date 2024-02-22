@@ -12,7 +12,7 @@ class WithdrawOption implements USSDMenu
     {
         return continueSessionMessage(ussdMenu([
             "Withdraw",
-            "Enter merchant ID"
+            "Enter agent ID"
         ]));
     }
 }
