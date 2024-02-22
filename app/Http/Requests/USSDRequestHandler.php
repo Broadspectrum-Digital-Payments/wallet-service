@@ -7,21 +7,25 @@ use App\Http\Requests\Actions\Registration;
 use App\Http\Responses\ArkeselUSSDResponse;
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
+use Random\RandomException;
 
 class USSDRequestHandler
 {
     /**
+     * @throws RandomException
      */
     public function handle(ArkeselUSSDRequest $request): JsonResponse
     {
         info("USSD Request:", $request->validated());
         $sessionData = $this->cacheSessionData($request);
 
-        $response = ($this->hasWallet($request->getMSISDN())) ?
-            Home::menu($request, $sessionData) :
-            Registration::menu($request, $sessionData);
+        if (!str_contains(strtolower($request->getUserData()), 'timeout')) {
+            $response = ($this->hasWallet($request->getMSISDN())) ?
+                Home::menu($request, $sessionData) :
+                Registration::menu($request, $sessionData);
 
-        return ArkeselUSSDResponse::message($request, $response);
+            return ArkeselUSSDResponse::message($request, $response);
+        }
     }
 
     /**
