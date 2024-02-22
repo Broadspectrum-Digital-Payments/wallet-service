@@ -9,6 +9,8 @@ use App\Models\User;
 use App\Notifications\PINUpdatedNotification;
 use App\Services\WalletService;
 use Illuminate\Support\Facades\Hash;
+use Psr\Container\ContainerExceptionInterface;
+use Psr\Container\NotFoundExceptionInterface;
 use Psr\SimpleCache\InvalidArgumentException;
 use Random\RandomException;
 
@@ -86,29 +88,43 @@ class WalletOption implements USSDMenu
      * @param ArkeselUSSDRequest $request The USSD request object.
      * @param array $sessionData The session data array.
      * @return array The response message as an array.
-     * @throws RandomException
      * @throws InvalidArgumentException
+     * @throws RandomException
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
      */
     private static function handleChangPIN(ArkeselUSSDRequest $request, array $sessionData): array
     {
-        info($sessionData);
-
         if (self::isSecondLevelOption($sessionData)) return continueSessionMessage(ussdMenu([
             "Change PIN",
-            "Enter current PIN:"
+            "Enter current 6 digit PIN:"
         ]));
 
-        if (self::isThirdLevelOption($sessionData)) return continueSessionMessage(ussdMenu([
-            "Change PIN",
-            "Enter new PIN:"
-        ]));
+        if (self::isThirdLevelOption($sessionData)) {
 
-        if (self::isForthLevelOption($sessionData)) return continueSessionMessage(ussdMenu([
-            "Change PIN",
-            "Confirm new PIN:"
-        ]));
+            if (!Hash::check($sessionData[2], User::findByPhoneNumber($request->getMSISDN())->pin)) {
+                return endedSessionMessage('The current PIN your ended is incorrect');
+            }
+
+            return continueSessionMessage(ussdMenu([
+                "Change PIN",
+                "Enter new PIN:"
+            ]));
+        }
+
+        if (self::isForthLevelOption($sessionData)) {
+
+            return continueSessionMessage(ussdMenu([
+                "Change PIN",
+                "Confirm new PIN:"
+            ]));
+        }
 
         if (self::isFifthLevelOption($sessionData)) {
+
+            if (trim($sessionData[3]) <> trim($sessionData[4])) {
+                return endedSessionMessage('PIN mismatch, please try again.');
+            }
             // Send change PIN request, this triggers an OTP
             sendOTP($request->getMSISDN());
             return continueSessionMessage(ussdMenu([
@@ -122,16 +138,8 @@ class WalletOption implements USSDMenu
         if (self::isSixthLevelOption($sessionData)) {
             $message = "PIN change failed, please try again later";
 
-            if (!Hash::check($sessionData[2], $user->pin)) {
-                $message = 'The current PIN your ended is incorrect';
-            }
-
-            if (trim($sessionData[3]) <> trim($sessionData[4])) {
-                $message = 'PIN mismatch, please try again.';
-            }
-
             if (!checkOTP($request->getMSISDN(), trim($sessionData[5]))) {
-                $message = 'The OTP you entered is wrong.';
+                return endedSessionMessage('The OTP you entered is wrong.');
             }
 
             if ($user->update(['pin' => trim($sessionData[4])])) {
