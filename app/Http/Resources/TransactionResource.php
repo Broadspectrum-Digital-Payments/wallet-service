@@ -22,6 +22,7 @@ class TransactionResource extends JsonResource
             'currency' => 'GHS',
             'accountNumber' => $this->account_number,
             'accountIssuer' => $this->account_issuer,
+            'accountName' => $this->account_name,
             'amount' => abs($this->amount),
             'balanceBefore' => $this->balance_before,
             'balanceAfter' => $this->balance_after,
