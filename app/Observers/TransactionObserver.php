@@ -14,9 +14,9 @@ class TransactionObserver
         $transaction->fee = $transaction->fee ?? 0;
         $transaction->tax = $transaction->tax ?? 0;
 
-        if (in_array($transaction->type, Transaction::DEBIT_TYPES)) {
-            $transaction->amount = $transaction->amount * -1;
-        }
+        if ($transaction->isDebit() && $transaction->amount > 0) $transaction->amount = $transaction->amount * -1;
+
+        if ($transaction->isCredit() && $transaction->amount < 0) $transaction->amount = $transaction->amount * -1;
 
         $transaction->balance_before = $transaction->user->available_balance;
         $transaction->balance_after = $transaction->balance_before + $transaction->amount;
