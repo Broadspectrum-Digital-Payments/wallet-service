@@ -29,6 +29,7 @@ class TransactionObserver
     public function created(Transaction $transaction): void
     {
         $transaction->user->updateBalances();
+
         if ($transaction->isCompleted()) event(new UserBalanceUpdatedEvent(user: $transaction->user, transaction: $transaction));
     }
 

@@ -132,6 +132,11 @@ class User extends Authenticatable
         return number_format($this->available_balance / 100, 2);
     }
 
+    public function getActualBalanceInMajorUnits(): string
+    {
+        return number_format($this->actual_balance / 100, 2);
+    }
+
     /**
      * Transfer funds to another account.
      *
@@ -146,7 +151,7 @@ class User extends Authenticatable
     public function transfer(int $amount, string $accountNumber, string $description, string $stan, bool $p2p = true): ?Transaction
     {
         if ($p2p && $user = self::findByPhoneNumber($accountNumber)) {
-            return $user->transactions()->create([
+            $user->transactions()->create([
                 'stan' => $stan,
                 'amount' => $amount,
                 'description' => $description,
@@ -155,7 +160,6 @@ class User extends Authenticatable
                 'account_issuer' => 'gmo',
                 'account_name' => $this->name,
                 'type' => Transaction::CASH_IN,
-                'status' => Transaction::COMPLETED
             ]);
         }
 

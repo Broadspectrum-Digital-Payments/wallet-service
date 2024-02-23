@@ -32,7 +32,7 @@ class SuccessfulTransferNotification extends Notification
 
     public function toSMS(object $notifiable): string
     {
-        return "You have transferred GHS {$this->transaction->getAmountInMajorUnits()} to {$this->transaction->account_name} [{$this->transaction->account_number}]. Your available balance is GHS {$this->transaction->getAvailableBalanceInMinorUnits()}. Transaction ID: {$this->transaction->stan}. Fee GHS 0.00";
+        return "You have transferred GHS {$this->transaction->getAmountInMajorUnits()} to {$this->transaction->account_name} [{$this->transaction->account_number}]. Your available balance is GHS {$this->transaction->user->getAvailableBalanceInMajorUnits()}. Transaction ID: {$this->transaction->stan}. Fee GHS 0.00";
     }
 
     /**

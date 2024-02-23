@@ -33,7 +33,9 @@ class Transaction extends Model
         'account_number',
         'account_name',
         'account_issuer',
-        'status'
+        'status',
+        'fee',
+        'tax'
     ];
 
     const REMITTANCE_ACCOUNT_ISSUERS = [self::MTN, self::VODAFONE_CASH, self::ATM];
