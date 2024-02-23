@@ -32,8 +32,8 @@ class TransactionResource extends JsonResource
             'balanceAfterInMajorUnits' => $this->getBalanceAfterInMajorUnits(),
             'description' => $this->description,
             'status' => $this->status,
-            'createdAt' => $this->created_at,
-            'updatedAt' => $this->updated_at,
+            'createdAt' => $this->created_at->format('Y-m-d H:i:s'),
+            'updatedAt' => $this->updated_at->format('Y-m-d H:i:s'),
             'user' => new UserResource($this->whenLoaded('user'))
         ];
     }
