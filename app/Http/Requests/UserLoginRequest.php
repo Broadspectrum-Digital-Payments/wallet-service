@@ -32,9 +32,7 @@ class UserLoginRequest extends FormRequest implements HttpRequest
     public function messages(): array
     {
         return [
-            'phoneNumber' => [
-                'digits' => 'Phone number must be 10 digits'
-            ]
+            'phoneNumber.digits' => 'Phone number must be 10 digits'
         ];
     }
 
