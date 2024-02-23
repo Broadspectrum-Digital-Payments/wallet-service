@@ -150,7 +150,7 @@ class User extends Authenticatable
      */
     public function transfer(int $amount, string $accountNumber, string $description, string $stan, bool $p2p = true): ?Transaction
     {
-        if ($p2p && $user = self::findByPhoneNumber($accountNumber)) {
+        if ($p2p && $user = self::findByPhoneNumber(phoneNumberToInternationalFormat($accountNumber))) {
             $user->transactions()->create([
                 'stan' => $stan,
                 'amount' => $amount,

@@ -21,14 +21,6 @@ class TransferMoneyOption implements USSDMenu
         $amount = $sessionData[3] ?? 0;
         $user = User::findByPhoneNumber($request->getMSISDN());
 
-        if (isset($sessionData[5])) {
-            return match ($sessionData[4]) {
-                '1' => self::transferFunds($user, (float)$amount * 100, $sessionData[2], 'P2P Transfer', 'gmo', $request->getSessionId()),
-                '2' => self::cancelTransaction($request->getSessionId()),
-                default => unknownOptionMessage()
-            };
-        }
-
         if (isset($sessionData[4])) {
             if ($sessionData[4] === '2') {
                 return self::cancelTransaction($request->getSessionId());
