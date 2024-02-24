@@ -23,12 +23,12 @@ class UserRegistrationRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name' => ['required', 'string', 'min:10'],
+            'name' => ['required', 'string'],
             'ghana_card_number' => ['required', 'string', 'min:10'],
             'phone_number' => ['required', 'digits:10', 'unique:users,phone_number'],
-            'pin' => ['required', 'digits:4'],
+            'pin' => ['required', 'digits:6'],
             'otp' => ['required', 'digits:6'],
-            'pinConfirmation' => ['required', 'digits:4', 'same:pin'],
+            'pinConfirmation' => ['required', 'digits:6', 'same:pin'],
             'type' => ['required', 'string']
         ];
     }
@@ -37,7 +37,7 @@ class UserRegistrationRequest extends FormRequest
     {
         $this->merge([
             'ghana_card_number' => $this->input('ghanaCardNumber'),
-            'phone_number' => $this->input('phoneNumber'),
+            'phone_number' => phoneNumberToInternationalFormat($this->input('phoneNumber')),
             'type' => str_contains($this->path(), 'agent') ? 'agent' : 'user'
         ]);
     }
