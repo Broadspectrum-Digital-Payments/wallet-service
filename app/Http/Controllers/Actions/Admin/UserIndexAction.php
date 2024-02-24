@@ -20,7 +20,7 @@ class UserIndexAction implements ControllerAction
             $users = User::query()
                 ->orderBy('name')
                 ->when($status = $request->query('status'), fn(Builder $query) => $query->where('status', '=', $status))
-                ->when($kycStatus = $request->query('kyc_status'), fn(Builder $query) => $query->where('kyc_status', '=', $kycStatus))
+                ->when($kycStatus = $request->query('kycStatus'), fn(Builder $query) => $query->where('kyc_status', '=', $kycStatus))
                 ->when($type = $request->query('type'), fn(Builder $query) => $query->where('type', '=', $type))
                 ->when($name = $request->query('name'), fn(Builder $query) => $query->where('name', 'LIKE', "%$name%"))
                 ->when($phone = $request->query('phoneNumber'), fn(Builder $query) => $query->where('phone_number', 'LIKE', "%$phone%"))
