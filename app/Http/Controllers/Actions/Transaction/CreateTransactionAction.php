@@ -65,7 +65,7 @@ class CreateTransactionAction implements ControllerAction
 
     private function gMoneyAccountDoesNotExist($request) : bool
     {
-        return $request->validated('account_issuer') == Transaction::GMO && !User::findByPhoneNumber($request->validated('account_number'));
+        return $request->validated('account_issuer') == Transaction::GMO && !User::findByPhoneNumber(phoneNumberToInternationalFormat($request->validated('account_number')));
     }
 
     private function insufficientFunds($request): bool
