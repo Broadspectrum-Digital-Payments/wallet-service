@@ -37,7 +37,8 @@ class User extends Authenticatable
         'kyc_status',
         'available_balance',
         'actual_balance',
-        'type'
+        'type',
+        'password'
     ];
 
     /**

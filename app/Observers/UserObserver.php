@@ -11,6 +11,14 @@ class UserObserver
     public function creating(User $user): void
     {
         $user->external_id = uuid_create();
+
+        if ($user->type != 'lender') {
+            $user->password = $user->external_id;
+        }
+
+        if ($user->type == 'lender') {
+            $user->pin = $user->external_id;
+        }
     }
     /**
      * Handle the User "created" event.
