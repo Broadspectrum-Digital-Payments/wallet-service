@@ -39,7 +39,7 @@ class UserController extends Controller
         return successfulResponse(['data' => new UserResource($request->user())]);
     }
 
-    public function nameEnquiry(Request $request, UserNameEnquiryAction $action)
+    public function nameEnquiry(Request $request, UserNameEnquiryAction $action): JsonResponse
     {
         return $action->handle($request);
     }
