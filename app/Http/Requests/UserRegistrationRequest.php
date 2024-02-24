@@ -25,11 +25,18 @@ class UserRegistrationRequest extends FormRequest
         return [
             'name' => ['required', 'string'],
             'ghana_card_number' => ['required', 'string', 'min:10'],
-            'phone_number' => ['required', 'digits:10', 'unique:users,phone_number'],
+            'phone_number' => ['required', 'digits:12', 'unique:users,phone_number'],
             'pin' => ['required', 'digits:6'],
             'otp' => ['required', 'digits:6'],
             'pinConfirmation' => ['required', 'digits:6', 'same:pin'],
             'type' => ['required', 'string']
+        ];
+    }
+
+    public function messages(): array
+    {
+        return [
+            'phone_number.digits' => 'Phone number must be 10 digits'
         ];
     }
 
