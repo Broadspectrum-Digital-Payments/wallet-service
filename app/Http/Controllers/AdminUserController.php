@@ -29,7 +29,7 @@ class AdminUserController extends Controller
         return $action->handle($request, $user);
     }
 
-    public function transactons(User $user, Request $request, TransactionIndexAction $action)
+    public function transactions(User $user, Request $request, TransactionIndexAction $action)
     {
         return $action->handle($request, user: $user);
     }
