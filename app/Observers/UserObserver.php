@@ -27,6 +27,7 @@ class UserObserver
     public function created(User $user): void
     {
         if ($user->type === 'user') LoanService::registerBorrower($user);
+        if ($user->type === 'lender') LoanService::registerLender($user);
     }
 
     /**
