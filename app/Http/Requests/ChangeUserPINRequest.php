@@ -23,10 +23,15 @@ class ChangeUserPINRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'phoneNumber' => ['required', 'digits:10', 'exists:users,phone_number'],
+            'phoneNumber' => ['required', 'digits:12', 'exists:users,phone_number'],
             'otp' => ['required', 'digits:6'],
-            'pin' => ['required', 'digits:4'],
-            'pinConfirmation' => ['required', 'digits:4', 'same:pin'],
+            'pin' => ['required', 'digits:6'],
+            'pinConfirmation' => ['required', 'digits:6', 'same:pin'],
         ];
+    }
+
+    protected function prepareForValidation(): void
+    {
+        $this->merge(['phoneNumber' => phoneNumberToInternationalFormat($this->input('phoneNumber'))]);
     }
 }
