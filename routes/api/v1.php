@@ -27,8 +27,12 @@ Route::group(['prefix' => 'users'], function () {
 Route::post("/agents/register", [AgentController::class, 'register']);
 
 // Lenders
-Route::get("/lenders/login", [LenderController::class, 'login']);
-Route::post("/lenders/register", [LenderController::class, 'register']);
+Route::controller(LenderController::class)
+    ->prefix('lenders')
+    ->group(function () {
+        Route::post("/login", 'login');
+        Route::post("/register", 'register');
+    });
 
 Route::group(['middleware' => 'auth:sanctum'], function () {
     Route::resource('transactions', UserTransactionController::class)->only('index', 'store', 'show');
