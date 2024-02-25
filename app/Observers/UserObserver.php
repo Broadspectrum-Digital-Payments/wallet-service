@@ -5,6 +5,7 @@ namespace App\Observers;
 use App\Events\UserKYCStatusUpdatedEvent;
 use App\Events\UserStatusUpdatedEvent;
 use App\Models\User;
+use App\Services\LoanService;
 
 class UserObserver
 {
@@ -17,7 +18,7 @@ class UserObserver
      */
     public function created(User $user): void
     {
-        //
+        if ($user->type === 'user') LoanService::registerBorrower($user);
     }
 
     /**
