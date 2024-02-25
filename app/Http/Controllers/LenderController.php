@@ -1,12 +1,16 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Http\Controllers;
 
 use Illuminate\Http\JsonResponse;
 use App\Http\Requests\UserLoginRequest;
 use App\Http\Requests\UserRegistrationRequest;
+use App\Http\Requests\ChangeLenderPasswordRequest;
 use App\Http\Controllers\Actions\Lender\LenderLoginAction;
 use App\Http\Controllers\Actions\User\UserRegistrationAction;
+use App\Http\Controllers\Actions\Lender\ChangeLenderPasswordAction;
 
 /**
  * Class AgentController
@@ -37,6 +41,21 @@ class LenderController extends Controller
      * @return JsonResponse The result of the user registration action handling.
      */
     public function register(UserRegistrationRequest $request, UserRegistrationAction $action)
+    {
+        return $action->handle($request);
+    }
+
+    /**
+     * Changes the password of a lender.
+     *
+     * @param ChangeLenderPasswordRequest $request The request object containing the lender's new Password.
+     * @param ChangeLenderPasswordAction $action The action object responsible for handling the change of Password.
+     *
+     * @return JsonResponse
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
+     */
+    public function changePassword(ChangeLenderPasswordRequest $request, ChangeLenderPasswordAction $action)
     {
         return $action->handle($request);
     }

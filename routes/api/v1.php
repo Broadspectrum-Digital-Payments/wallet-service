@@ -32,6 +32,7 @@ Route::controller(LenderController::class)
     ->group(function () {
         Route::post("/login", 'login');
         Route::post("/register", 'register');
+        Route::put("/change-password", 'changePassword');
     });
 
 Route::group(['middleware' => 'auth:sanctum'], function () {
