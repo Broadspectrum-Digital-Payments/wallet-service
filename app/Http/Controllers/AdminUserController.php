@@ -29,8 +29,8 @@ class AdminUserController extends Controller
         return $action->handle($request, $user);
     }
 
-    public function transactions(Request $request, User $user, UserTransactionsAction $action)
+    public function transactions(Request $request, User $externalId, UserTransactionsAction $action)
     {
-        return $action->handle($request, user: $user);
+        return $action->handle($request, user: $externalId);
     }
 }
