@@ -8,7 +8,7 @@ use App\Http\Resources\UserResource;
 use App\Http\Requests\UpdateUserRequest;
 use App\Http\Controllers\Actions\Admin\UserIndexAction;
 use App\Http\Controllers\Actions\Admin\UpdateUserAction;
-use App\Http\Controllers\Actions\Transaction\TransactionIndexAction;
+use App\Http\Controllers\Actions\Transaction\UserTransactionsAction;
 
 class AdminUserController extends Controller
 {
@@ -29,7 +29,7 @@ class AdminUserController extends Controller
         return $action->handle($request, $user);
     }
 
-    public function transactions(User $user, Request $request, TransactionIndexAction $action)
+    public function transactions(Request $request, User $user, UserTransactionsAction $action)
     {
         return $action->handle($request, user: $user);
     }
