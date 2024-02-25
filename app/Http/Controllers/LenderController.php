@@ -9,8 +9,8 @@ use App\Http\Requests\UserLoginRequest;
 use App\Http\Requests\UserRegistrationRequest;
 use App\Http\Requests\ChangeLenderPasswordRequest;
 use App\Http\Controllers\Actions\Lender\LenderLoginAction;
-use App\Http\Controllers\Actions\User\UserRegistrationAction;
 use App\Http\Controllers\Actions\Lender\ChangeLenderPasswordAction;
+use App\Http\Controllers\Actions\Transaction\LenderRegistrationAction;
 
 /**
  * Class AgentController
@@ -37,10 +37,10 @@ class LenderController extends Controller
      * Registers a user.
      *
      * @param UserRegistrationRequest $request The user registration request object containing the user details.
-     * @param UserRegistrationAction $action The action object used to handle the user registration.
+     * @param LenderRegistrationAction $action The action object used to handle the user registration.
      * @return JsonResponse The result of the user registration action handling.
      */
-    public function register(UserRegistrationRequest $request, UserRegistrationAction $action)
+    public function register(UserRegistrationRequest $request, LenderRegistrationAction $action)
     {
         return $action->handle($request);
     }

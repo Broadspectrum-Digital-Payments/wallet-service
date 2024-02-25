@@ -30,7 +30,6 @@ class UserRegistrationRequest extends FormRequest
             'name' => ['required', 'string'],
             'ghana_card_number' => ['required', 'string', 'min:10'],
             'phone_number' => ['required', 'digits:12', 'unique:users,phone_number'],
-            'otp' => ['required', 'digits:6'],
             'type' => ['required', 'string'],
         ] + $this->getRequiredFeildByUserType();
     }
@@ -68,6 +67,7 @@ class UserRegistrationRequest extends FormRequest
             [
                 'pin' => ['required', 'digits:6'],
                 'pinConfirmation' => ['required', 'digits:6', 'same:pin'],
+                'otp' => ['required', 'digits:6'],
             ];
     }
 }
