@@ -30,8 +30,10 @@ class UpdateUserRequest extends FormRequest
 
     protected function prepareForValidation(): void
     {
-        $this->merge([
-            'kyc_status' => $this->input('kycStatus')
-        ]);
+        if ($this->input('kycStatus')) {
+            $this->merge([
+                'kyc_status' => $this->input('kycStatus')
+            ]);
+        }
     }
 }

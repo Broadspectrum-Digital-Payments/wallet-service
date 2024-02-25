@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AgentController;
+use App\Http\Controllers\LenderController;
 use App\Http\Controllers\UserTransactionController;
 
 Route::group(['prefix' => 'users'], function () {
@@ -24,6 +25,15 @@ Route::group(['prefix' => 'users'], function () {
 });
 
 Route::post("/agents/register", [AgentController::class, 'register']);
+
+// Lenders
+Route::controller(LenderController::class)
+    ->prefix('lenders')
+    ->group(function () {
+        Route::post("/login", 'login');
+        Route::post("/register", 'register');
+        Route::put("/change-password", 'changePassword');
+    });
 
 Route::group(['middleware' => 'auth:sanctum'], function () {
     Route::resource('transactions', UserTransactionController::class)->only('index', 'store', 'show');

@@ -3,11 +3,13 @@
 namespace App\Http\Requests;
 
 use App\Interfaces\HttpRequest;
-use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Contracts\Validation\ValidationRule;
 
 class UserLoginRequest extends FormRequest implements HttpRequest
 {
+    private bool $isLender = false;
+
     /**
      * Determine if the user is authorized to make this request.
      */
@@ -23,10 +25,15 @@ class UserLoginRequest extends FormRequest implements HttpRequest
      */
     public function rules(): array
     {
-        return [
-            'phoneNumber' => ['required', 'digits:12', 'exists:users,phone_number'],
-            'pin' => ['required', 'digits:6']
-        ];
+        return $this->isLender
+            ? [
+                'email' => ['required', 'email', 'exists:users,email'],
+                'password' => ['required', 'string'],
+            ]
+            : [
+                'pin' => ['required', 'digits:6'],
+                'phoneNumber' => ['required', 'digits:12', 'exists:users,phone_number']
+            ];
     }
 
     public function messages(): array
@@ -38,6 +45,8 @@ class UserLoginRequest extends FormRequest implements HttpRequest
 
     protected function prepareForValidation(): void
     {
-        $this->merge(['phoneNumber' => phoneNumberToInternationalFormat($this->input('phoneNumber'))]);
+        if (!($this->isLender = str_contains($this->path(), 'lender'))) {
+            $this->merge(['phoneNumber' => phoneNumberToInternationalFormat($this->input('phoneNumber'))]);
+        }
     }
 }

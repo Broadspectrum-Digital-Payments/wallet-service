@@ -19,6 +19,10 @@ services:
             IGNITION_LOCAL_SITES_PATH: '${PWD}'
         volumes:
             - '.:/var/www/html'
+        command:
+            - '/bin/sh'
+            - '-c'
+            - 'php artisan queue:work'
         networks:
             - sail
         depends_on:

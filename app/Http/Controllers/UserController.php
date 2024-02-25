@@ -36,10 +36,10 @@ class UserController extends Controller
 
     public function me(Request $request)
     {
-        return successfulResponse(['data' => new UserResource($request->user())]);
+        return successfulResponse(['data' => new UserResource($request->user()->load('files'))]);
     }
 
-    public function nameEnquiry(Request $request, UserNameEnquiryAction $action)
+    public function nameEnquiry(Request $request, UserNameEnquiryAction $action): JsonResponse
     {
         return $action->handle($request);
     }

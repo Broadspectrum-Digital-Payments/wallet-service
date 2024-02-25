@@ -12,7 +12,7 @@ class UserNameEnquiryAction
     public function handle(Request $request)
     {
         try {
-            if ($user = User::query()->where('phone_number', '=', $request->query('phoneNumber'))->first()) {
+            if ($user = User::query()->where('phone_number', '=', phoneNumberToInternationalFormat($request->query('phoneNumber')))->first()) {
                 return successfulResponse([
                     'data' => [
                         'name' => $user->name,

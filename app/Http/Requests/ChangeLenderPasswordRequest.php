@@ -1,11 +1,14 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Http\Requests;
 
-use Illuminate\Contracts\Validation\ValidationRule;
+use Illuminate\Validation\Rules\Password;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Contracts\Validation\ValidationRule;
 
-class ChangeUserPINRequest extends FormRequest
+class ChangeLenderPasswordRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -25,8 +28,8 @@ class ChangeUserPINRequest extends FormRequest
         return [
             'phoneNumber' => ['required', 'digits:12', 'exists:users,phone_number'],
             'otp' => ['required', 'digits:6'],
-            'pin' => ['required', 'digits:6'],
-            'pinConfirmation' => ['required', 'digits:6', 'same:pin'],
+            'password' => ['required', Password::defaults()],
+            'passwordConfirmation' => ['required', 'same:password'],
         ];
     }
 
