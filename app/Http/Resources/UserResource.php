@@ -19,12 +19,13 @@ class UserResource extends JsonResource
             'name' => $this->name,
             'ghanaCardNumber' => $this->ghana_card_number,
             'phoneNumber' => $this->phone_number,
+            'email' => $this->when($this->email, fn () => $this->email),
             'type' => $this->type,
             'status' => $this->status,
             'kycStatus' => $this->kyc_status,
             'actualBalance' => number_format($this->actual_balance / 100, 2),
             'availableBalance' => number_format($this->available_balance / 100, 2),
-            'bearerToken' => $this->when($this->bearerToken, fn() => $this->bearerToken),
+            'bearerToken' => $this->when($this->bearerToken, fn () => $this->bearerToken),
             'createdAt' => $this->created_at,
             'files' => FileResource::collection($this->whenLoaded('files'))
         ];
