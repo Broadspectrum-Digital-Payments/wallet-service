@@ -11,5 +11,5 @@ Route::get('/', function () {
 });
 
 Route::prefix('webhooks')->group(function () {
-    Route::post('/middleware', [WebhookController::class, 'middlewareCallback'])->name('middleware.callback');
+    Route::put('/middleware', [WebhookController::class, 'middlewareCallback'])->name('middleware.callback');
 });
