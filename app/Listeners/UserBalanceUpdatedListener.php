@@ -78,12 +78,14 @@ class UserBalanceUpdatedListener
      */
     private function transferAmountToUser(Transaction $transaction): void
     {
-        $transaction->user->transfer(
-            $transaction->amount,
-            $transaction->account_number,
-            $transaction->description,
-            $transaction->stan,
-            $transaction->isP2P()
-        );
+        if ($transaction->status === Transaction::COMPLETED) {
+            $transaction->user->transfer(
+                $transaction->amount,
+                $transaction->account_number,
+                $transaction->description,
+                $transaction->stan,
+                $transaction->isP2P()
+            );
+        }
     }
 }
