@@ -12,17 +12,16 @@ class UserNameEnquiryAction
     public function handle(Request $request)
     {
         try {
-            if ($user = User::query()->where('phone_number', '=', phoneNumberToInternationalFormat($request->query('phoneNumber')))->first()) {
-                return successfulResponse([
-                    'data' => [
-                        'name' => $user->name,
-                        'phoneNumber' => $user->phone_number,
-                        'status' => $user->status
-                    ]
-                ], "Wallet found");
-            }
+            $user = User::query()->where('phone_number', '=', phoneNumberToInternationalFormat($request->query('phoneNumber')))->first() ??
+                new User(['name' => 'Account Name', 'phone_number' => phoneNumberToInternationalFormat($request->query('phoneNumber'))]);
 
-            return errorResponse("Wallet does not exist", ResponseAlias::HTTP_NOT_FOUND);
+            return successfulResponse([
+                'data' => [
+                    'name' => $user->name,
+                    'phoneNumber' => $user->phone_number,
+                    'status' => $user->status
+                ]
+            ], "Wallet found");
         } catch (Exception $exception) {
             report($exception);
         }

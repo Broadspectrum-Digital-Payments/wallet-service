@@ -31,4 +31,9 @@ return [
         'region' => env('AWS_DEFAULT_REGION', 'us-east-1'),
     ],
 
+    'middleware' => [
+        'bearerToken' => env('MIDDLEWARE_BEARER_TOKEN'),
+        'baseUrl' => env('MIDDLEWARE_BASE_URL')
+    ]
+
 ];

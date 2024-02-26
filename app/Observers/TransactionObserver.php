@@ -2,6 +2,8 @@
 
 namespace App\Observers;
 
+use App\Events\CollectionEvent;
+use App\Events\FundCollectionEvent;
 use App\Events\UserBalanceUpdatedEvent;
 use App\Models\Transaction;
 
@@ -13,6 +15,7 @@ class TransactionObserver
         $transaction->external_id = uuid_create();
         $transaction->fee = $transaction->fee ?? 0;
         $transaction->tax = $transaction->tax ?? 0;
+        $transaction->status = Transaction::QUEUED;
 
         if ($transaction->isDebit() && $transaction->amount > 0) $transaction->amount = $transaction->amount * -1;
 
@@ -30,7 +33,13 @@ class TransactionObserver
     {
         $transaction->user->updateBalances();
 
-        if ($transaction->isCompleted()) event(new UserBalanceUpdatedEvent(user: $transaction->user, transaction: $transaction));
+        if ($transaction->isCompleted()) {
+            event(new UserBalanceUpdatedEvent(user: $transaction->user, transaction: $transaction));
+        }
+
+        if ($transaction->queued() && !$transaction->isP2P() && $transaction->isRemittance()) {
+            event(new FundCollectionEvent(transaction: $transaction));
+        }
     }
 
     /**

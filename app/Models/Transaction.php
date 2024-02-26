@@ -22,6 +22,8 @@ class Transaction extends Model
 
     const COMPLETED = 'completed';
     const FAILED = 'failed';
+    const QUEUED = 'queued';
+    const REMITTANCE = 'remittance';
     protected $fillable = [
         'stan',
         'amount',
@@ -49,7 +51,6 @@ class Transaction extends Model
     const REVERSAL = 'reversal';
     const RESERVED = 'reserved';
     const CASH_IN = 'cash in';
-    const REMITTANCE = 'remittance';
     const MTN = 'mtn';
     const VODAFONE_CASH = 'vodafone cash';
     const ATM = 'atm';
@@ -113,5 +114,15 @@ class Transaction extends Model
     public static function findByStan(string $stan): Model|Builder|null
     {
         return self::query()->where('stan', '=', $stan)->first();
+    }
+
+    public function queued(): bool
+    {
+        return $this->status === Transaction::QUEUED;
+    }
+
+    public function isRemittance(): bool
+    {
+        return $this->type === self::REMITTANCE;
     }
 }

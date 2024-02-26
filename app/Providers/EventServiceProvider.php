@@ -29,6 +29,9 @@ class EventServiceProvider extends ServiceProvider
         ],
         'App\Events\UserKYCStatusUpdatedEvent' => [
             'App\Listeners\UserKYCStatusUpdatedListener'
+        ],
+        'App\Events\FundCollectionEvent' => [
+            'App\Listeners\FundCollectionListener'
         ]
     ];
 
