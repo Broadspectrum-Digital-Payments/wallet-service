@@ -10,5 +10,6 @@ Route::group(['middleware' => ['check.admin']], function () {
 
     Route::resource('transactions', AdminTransactionController::class)->only('index', 'show');
 
+    Route::get('reports/loans/download', [ReportController::class, 'loanReport']);
     Route::get('reports/transactions/download', [ReportController::class, 'transactionReport']);
 });
