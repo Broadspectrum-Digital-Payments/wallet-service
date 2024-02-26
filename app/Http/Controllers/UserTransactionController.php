@@ -17,6 +17,6 @@ class UserTransactionController extends Controller
 
     public function store(CreateUserTransactionRequest $request, CreateTransactionAction $action): JsonResponse
     {
-        return $action->handle($request);
+        return $action->handle($request, $request->user());
     }
 }

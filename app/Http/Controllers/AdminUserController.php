@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Controllers\Actions\Transaction\CreateTransactionAction;
+use App\Http\Requests\CreateUserTransactionRequest;
 use App\Models\User;
 use Illuminate\Http\Request;
 use App\Http\Resources\UserResource;
@@ -32,5 +34,10 @@ class AdminUserController extends Controller
     public function transactions(Request $request, User $externalId, UserTransactionsAction $action)
     {
         return $action->handle($request, user: $externalId);
+    }
+
+    public function performTransaction(User $user, CreateUserTransactionRequest $request, CreateTransactionAction $action)
+    {
+        return $action->handle($request, $user);
     }
 }
