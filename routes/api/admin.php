@@ -1,7 +1,8 @@
 <?php
 
-use App\Http\Controllers\AdminTransactionController;
+use App\Http\Controllers\ReportController;
 use App\Http\Controllers\AdminUserController;
+use App\Http\Controllers\AdminTransactionController;
 
 Route::group(['middleware' => ['check.admin']], function () {
     Route::get('/users/{externalId}/transactions', [AdminUserController::class, 'transactions']);
@@ -9,4 +10,7 @@ Route::group(['middleware' => ['check.admin']], function () {
     Route::post('/users/{user}/transactions', [AdminUserController::class, 'performTransaction']);
 
     Route::resource('transactions', AdminTransactionController::class)->only('index', 'show');
+
+    Route::get('reports/loans/download', [ReportController::class, 'loanReport']);
+    Route::get('reports/transactions/download', [ReportController::class, 'transactionReport']);
 });
