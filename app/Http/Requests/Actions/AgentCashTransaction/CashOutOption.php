@@ -34,13 +34,13 @@ final class CashOutOption
                 return endedSessionMessage('Wrong input, please check and try again.');
             }
 
-            return self::initiateFundstransfer(self::customer($sessionData[self::ACCT_NO]), (float)$amount * 100, $request->getMSISDN(), 'B2C Transfer', 'gmo', $request->getSessionId());
+            return self::initiateFundsRequest(self::customer($sessionData[self::ACCT_NO]), (float)$amount * 100, $request->getMSISDN(), 'P2P Transfer', 'gmo', $request->getSessionId());
         }
 
         if (isset($sessionData[self::AMOUNT])) {
             if ((self::customer($sessionData[self::ACCT_NO]))->available_balance < ((float)$amount * 100)) {
                 clearSessionData($request->getSessionId());
-                return endedSessionMessage("Customer doesn't have enough funds to perform this transactions");
+                return endedSessionMessage("Customer does not have enough funds for this transactions");
             }
 
             return continueSessionMessage(\ussdMenu([
@@ -78,7 +78,7 @@ final class CashOutOption
     /**
      * @throws InvalidArgumentException
      */
-    private static function initiateFundstransfer(User $customer, int|float $amount, string $accountNumber, string $description, string $accountIssuer, string $sessionId): array
+    private static function initiateFundsRequest(User $customer, float $amount, string $accountNumber, string $description, string $accountIssuer, string $sessionId): array
     {
         $transaction = $customer->transactions()->create([
             'amount' => $amount,
@@ -92,7 +92,8 @@ final class CashOutOption
         clearSessionData($sessionId);
 
         if ($transaction) {
-            return endedSessionMessage("An approval message has been sent to {$transaction->account_number}, please await a success message.");
+            $phone = phoneNumberToLocalFormat($customer->phone_number);
+            return endedSessionMessage("An approval message has been sent to $phone, please await a success message.");
         }
 
         return endedSessionMessage('Cash out failed, please try again later.');

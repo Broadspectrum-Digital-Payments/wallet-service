@@ -48,7 +48,7 @@ final class CashInOption
             }
 
             return continueSessionMessage(\ussdMenu([
-                'Confirm deposit of GHS ' . $sessionData[self::AMOUNT] . ' from G-Money account: ' . $sessionData[self::ACCT_NO] . ' [Account Name]' . ' fee: 0.0',
+                'Confirm deposit of GHS ' . $sessionData[self::AMOUNT] . ' into G-Money account: ' . $sessionData[self::ACCT_NO] . ' [Account Name]' . ' fee: 0.0',
                 '',
                 'Enter PIN to confirm or 2 to cancel',
             ]));
@@ -81,7 +81,7 @@ final class CashInOption
     /**
      * @throws InvalidArgumentException
      */
-    private static function depositFunds(User $user, int $amount, string $accountNumber, string $description, string $accountIssuer, string $sessionId): array
+    private static function depositFunds(User $user, float $amount, string $accountNumber, string $description, string $accountIssuer, string $sessionId): array
     {
         $transaction = $user->transactions()->create([
             'amount' => $amount,

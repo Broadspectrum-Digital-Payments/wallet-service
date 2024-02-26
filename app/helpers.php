@@ -170,3 +170,8 @@ function phoneNumberToInternationalFormat(string $phoneNumber): string
 {
     return '233' . substr($phoneNumber, -9);
 }
+
+function phoneNumberToLocalFormat(string $phoneNumber): string
+{
+    return '0' . substr($phoneNumber, -9);
+}

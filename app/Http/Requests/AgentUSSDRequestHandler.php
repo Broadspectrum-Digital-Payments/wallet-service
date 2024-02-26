@@ -16,7 +16,7 @@ final class AgentUSSDRequestHandler
         $sessionData = $this->cacheSessionData($request);
 
         if (!str_contains(strtolower($request->getUserData()), 'timeout')) {
-            $response = ($this->hasWallet($request->getMSISDN())) ?
+            $response = ($this->isAuthorized($request->getMSISDN())) ?
                 AgentHome::menu($request, $sessionData) :
                 $this->isNotAgentMessage();
 
@@ -42,6 +42,13 @@ final class AgentUSSDRequestHandler
     public function hasWallet(string $phoneNumber): bool
     {
         return User::query()->where('phone_number', '=', $phoneNumber)->count();
+    }
+
+    public function isAuthorized(string $phoneNumber): bool
+    {
+        $user = User::findByPhoneNumber($phoneNumber);
+
+        return $user && $user?->type == User::AGENT;
     }
 
     private function isNotAgentMessage(): array
