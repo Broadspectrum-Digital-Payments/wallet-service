@@ -28,7 +28,7 @@ class DashboardAggregatorAction
                 return array_merge($item, $loan);
             })->values()->all();
 
-            return successfulResponse(data: array_values($aggregate));
+            return successfulResponse(data: ['data' => array_values($aggregate)]);
         } catch (Exception $exception) {
             report($exception);
         }
