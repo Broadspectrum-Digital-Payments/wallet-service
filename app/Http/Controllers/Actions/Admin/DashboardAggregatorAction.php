@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Actions\Admin;
 
 use Exception;
+use App\Models\User;
 use App\Models\Transaction;
 use Illuminate\Http\Request;
 use App\Services\LoanService;
@@ -13,29 +14,42 @@ class DashboardAggregatorAction
     public function handle(Request $request)
     {
         try {
-            $transactionStats = $this->getTransactionsAggregate();
+            $loanStats = [];
+            $stats = $this->getTotalUserCounts();
 
-            $loanStats = collect($this->getLoansAggregate()['data']['loans'])->groupBy(function ($item) {
-                return date('M', strtotime($item['createdAt']));
-            })->map(function ($groupedData) {
-                $loanVolume = $groupedData->count();
-                $loanValue = $groupedData->sum('principal');
-                return compact('loanVolume', 'loanValue');
-            });
+            $transactionStats = collect($this->getTransactionsAggregate());
 
-            $aggregate = collect($transactionStats)->map(function ($item) use ($loanStats) {
-                $loan = $loanStats->get($item['name'], ['loanVolume' => 0, 'loanValue' => 0]);
+            [$hasData, $loanData] = $this->getLoansAggregate();
+
+            if ($hasData) {
+                $stats['totalLoanCount'] = $loanData['data']['stats']['submitted'] ?? 0;
+
+                $loanStats = collect($loanData['data']['loans'])->groupBy(function ($item) {
+                    return date('M', strtotime($item['createdAt']));
+                })->map(function ($groupedData) {
+                    $loanVolume = $groupedData->count();
+                    $loanValue = $groupedData->sum('principal');
+                    return compact('loanVolume', 'loanValue');
+                });
+            }
+
+            $stats['totalTransactionValue'] = $transactionStats->sum('transactionValue');
+
+            $aggregate = !empty($transactionStats->all()) ? $transactionStats->map(function ($item) use ($loanStats) {
+                $loan = $loanStats->get($item['name'] ?? '', ['loanVolume' => 0, 'loanValue' => 0]);
                 return array_merge($item, $loan);
-            })->values()->all();
+            })->values()->all() : $loanStats->toArray();
 
-            return successfulResponse(data: ['data' => array_values($aggregate)]);
+            return successfulResponse(data: ['data' => [
+                'stats' => $stats,
+                'aggregates' => array_values($aggregate)
+            ]]);
         } catch (Exception $exception) {
             report($exception);
         }
 
         return errorResponse();
     }
-
 
     private function getTransactionsAggregate()
     {
@@ -52,10 +66,29 @@ class DashboardAggregatorAction
             ->get()
             ->toArray();
     }
+
     private function getLoansAggregate()
     {
         $response = LoanService::makeRequest('/v1/loans');
 
-        return $response->successful() ? $response->json() : [];
+        return ($isSucces = $response->successful()) ? [$isSucces, $response->json()] : [$isSucces, []];
+    }
+
+    public function getTotalUserCounts()
+    {
+        $userCounts = User::select('type', DB::raw('COUNT(*) as total'))
+            ->groupBy('type')
+            ->get()
+            ->pluck('total', 'type');
+
+        $totalCustomers = $userCounts->get('user', 0);
+        $totalLenders = $userCounts->get('lender', 0);
+        $totalAgents = $userCounts->get('agent', 0);
+
+        return [
+            'totalCustomers' => $totalCustomers,
+            'totalLenders' => $totalLenders,
+            'totalAgents' => $totalAgents,
+        ];
     }
 }
