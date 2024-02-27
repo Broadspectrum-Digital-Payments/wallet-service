@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace App\Exports\Action;
 
 use App\Exports\LoansExport;
+use App\Services\LoanService;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
-use Illuminate\Support\Facades\Http;
 use Maatwebsite\Excel\Facades\Excel;
 
 final class LoansReportAction
@@ -15,7 +15,7 @@ final class LoansReportAction
     public function handle(Request $request)
     {
         try {
-            $response = $this->getLoansRequest('/v1/loans', $this->makeFilterParams($request));
+            $response = LoanService::makeRequest('/v1/loans', $this->makeFilterParams($request));
 
             info("Get Loan response", $response->json());
 
@@ -52,18 +52,5 @@ final class LoansReportAction
         }
 
         return $params;
-    }
-
-    public function getLoansRequest(
-        string $path,
-        mixed $query = null,
-        string $method = 'get',
-        array $headers = [
-            'Accept' => 'application/json',
-            'Content-Type' => 'application/json',
-        ]
-    ) {
-        return Http::withHeaders($headers)
-            ->{$method}(env('LOAN_BASE_URL') . $path, $query);
     }
 }

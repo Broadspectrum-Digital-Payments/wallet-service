@@ -13,7 +13,7 @@ class LoanService
             $response = Http::withHeaders([
                 'Accept' => 'application/json',
                 'Content-Type' => 'application/json',
-            ])->post(env('LOAN_BASE_URL'). '/v1/borrowers', [
+            ])->post(env('LOAN_BASE_URL') . '/v1/borrowers', [
                 'externalId' => $user->external_id,
                 'name' => $user->name,
                 'phoneNumber' => '0' . substr($user->phone_number, -9)
@@ -33,7 +33,7 @@ class LoanService
             $response = Http::withHeaders([
                 'Accept' => 'application/json',
                 'Content-Type' => 'application/json',
-            ])->post(env('LOAN_BASE_URL'). '/v1/lenders', [
+            ])->post(env('LOAN_BASE_URL') . '/v1/lenders', [
                 'externalId' => $user->external_id,
                 'name' => $user->name,
                 'email' => $user->email,
@@ -46,5 +46,18 @@ class LoanService
         }
 
         return [];
+    }
+
+    public static function makeRequest(
+        string $path,
+        mixed $query = null,
+        string $method = 'get',
+        array $headers = [
+            'Accept' => 'application/json',
+            'Content-Type' => 'application/json',
+        ]
+    ) {
+        return Http::withHeaders($headers)
+            ->{$method}(env('LOAN_BASE_URL') . $path, $query);
     }
 }
